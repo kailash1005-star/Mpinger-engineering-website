@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-gold: #B8860B;
+  --color-gold-light: #DAA520;
+  --color-gold-dark: #8B6508;
+}
+
+/* Custom scrollbars and styling tweaks to match the clean minimalist mockup */
+body {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.tracking-ultra {
+  letter-spacing: 0.4em;
+}
+
+/* Add custom animations for extra polish */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(184, 134, 11, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(184, 134, 11, 0.4);
+  }
+}
+
+.gold-glow {
+  animation: pulseGlow 4s infinite ease-in-out;
+}
+
