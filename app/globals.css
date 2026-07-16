@@ -7,6 +7,10 @@
 :root {
   --background: #050505;
   --foreground: #ffffff;
+  --brand-dark: #0b4e86;
+  --brand: #1d6fb5;
+  --brand-light: #3f97dd;
+  --surface: #f3f6fa;
 }
 
 body {
@@ -18,31 +22,29 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbar - Minimal, Dark, Premium */
+/* Custom Scrollbar - Visible, draggable, brand blue */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: #e8eef4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1a1a1a;
-  border-radius: 4px;
-  border: 2px solid #050505;
-  transition: background 0.3s ease;
+  background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand-light) 100%);
+  border-radius: 6px;
+  border: 2px solid #e8eef4;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #333333;
+  background: linear-gradient(180deg, #0d5996 0%, #56a8e6 100%);
 }
 
-/* Hide default browser scrollbar buttons and keep smooth track */
 body {
-  scrollbar-width: thin;
-  scrollbar-color: #1a1a1a #050505;
+  scrollbar-width: auto;
+  scrollbar-color: var(--brand) #e8eef4;
 }
 
 /* Core layouts */
