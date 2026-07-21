@@ -4,31 +4,22 @@ import { useRef } from "react";
 import {
   motion,
   useScroll,
-  useSpring,
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber, useMagneticSnap } from "./videoScroll";
+import { useVideoScrubber } from "./videoScroll";
 
 /**
- * Scroll-driven quality-lab tour. Scroll maps LINEARLY onto video time —
- * the same 1:1 pacing as the hero and parts sections (10s of footage over
- * 400vh). When the visitor stops scrolling, the page settles onto the
- * nearest sharp equipment showcase (motion-analyzed holds) so the resting
- * frame is always a crisp, presented instrument.
+ * Scroll-driven quality-lab tour. Scroll maps linearly and monotonically onto
+ * video time, so scrolling down only ever moves the footage forward. Smoothing
+ * lives entirely in the scrubber's rAF loop.
+ *
+ * 500vh gives the 240-frame tour 400vh of real scroll — deliberately MORE room
+ * per frame than the Parts chapters get. Matching Parts' ratio exactly was tried
+ * and felt jumpy: this footage pans faster than the slow parts orbits, so the
+ * same frames-per-wheel-notch reads as a series of jump cuts rather than motion.
+ * Pace is a function of how fast the camera moves, not just of frame count.
  */
-
-// Sharp showcase ranges in normalized video time, from per-frame motion
-// analysis: holds at 0–1.5s / 2.5–3.5s / 4–5s / 5.5–6.5s / 7.5–8.5s
-const HOLDS: [number, number][] = [
-  [0, 0.15],
-  [0.25, 0.35],
-  [0.4, 0.5],
-  [0.55, 0.65],
-  [0.75, 0.85],
-];
-
-const SNAP_ANCHORS = HOLDS.map(([s, e]) => (s + e) / 2);
 
 const BEATS = [
   {
@@ -96,16 +87,10 @@ export default function QualitySection() {
     offset: ["start start", "end end"],
   });
 
-  // Smooth the raw scroll so seeks glide instead of stuttering — same
-  // spring as the hero scrollytelling
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 50,
-    damping: 20,
-    restDelta: 0.001,
-  });
-
-  const isReady = useVideoScrubber(videoRef, smoothProgress);
-  useMagneticSnap(containerRef, SNAP_ANCHORS);
+  // Tighter follow than the 0.14 default: this tour must track the cursor
+  // rather than trail it. The extra scroll room above (500vh) is what buys the
+  // headroom to tighten — at a shorter section this would read as steppy.
+  const isReady = useVideoScrubber(videoRef, scrollYProgress, { smoothing: 0.06 });
 
   // Scroll hint fades out as soon as the tour starts
   const hintOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
@@ -114,8 +99,12 @@ export default function QualitySection() {
   const outroOpacity = useTransform(scrollYProgress, [0.93, 0.98], [0, 1]);
 
   return (
-    <section id="quality" ref={containerRef} className="relative w-full h-[400vh] bg-[#050505]">
+    <section id="quality" ref={containerRef} className="relative w-full h-[500vh] bg-[#050505]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-[#050505]">
+        {/* The Parts tours get their own compositing layer for free, via the
+            animated opacity on their motion.video. This one has no animated
+            style, so promote it explicitly — otherwise each seek can repaint on
+            the main thread along with the gradients stacked over it. */}
         <video
           ref={videoRef}
           src="/parts/quality-equipment.mp4"
@@ -123,6 +112,7 @@ export default function QualitySection() {
           muted
           playsInline
           disablePictureInPicture
+          style={{ transform: "translateZ(0)", willChange: "transform" }}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
 
@@ -143,7 +133,7 @@ export default function QualitySection() {
           </span>
         </motion.div>
 
-        {/* Minimal text beats aligned to sharp holds */}
+        {/* Minimal text beats, timed to the steadiest equipment showcases */}
         {BEATS.map((beat) => (
           <Beat key={beat.title} beat={beat} scrollYProgress={scrollYProgress} />
         ))}
@@ -160,7 +150,7 @@ export default function QualitySection() {
           </div>
           <div className="relative w-[2px] h-16 bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              style={{ scaleY: smoothProgress }}
+              style={{ scaleY: scrollYProgress }}
               className="absolute inset-0 bg-gradient-to-b from-[#3f97dd] to-[#7cbcf0] origin-top rounded-full"
             />
           </div>

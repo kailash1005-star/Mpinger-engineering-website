@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useScroll,
-  useSpring,
   useTransform,
   useMotionValueEvent,
   type MotionValue,
 } from "framer-motion";
+import { useVideoScrubber } from "./videoScroll";
 
 interface Beat {
   title: string;
@@ -102,9 +102,6 @@ export default function CncScrollytelling() {
 
   const [isReady, setIsReady] = useState<boolean>(false);
   const [loadPercentage, setLoadPercentage] = useState<number>(0);
-  const videoDurationRef = useRef<number>(0);
-  const isSeekingRef = useRef<boolean>(false);
-  const targetTimeRef = useRef<number>(0);
 
   // Set up useScroll tracking over the 400vh container
   const { scrollYProgress } = useScroll({
@@ -112,12 +109,11 @@ export default function CncScrollytelling() {
     offset: ["start start", "end end"],
   });
 
-  // Smooth scroll progress to prevent seeking stutter/jitter
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 50,
-    damping: 20,
-    restDelta: 0.001,
-  });
+  // Frame-quantized scrubbing, shared with the parts and quality tours. This
+  // footage runs at 30fps where those run at 24. Smoothing and seek throttling
+  // both live inside the hook — no spring here, since filtering the same signal
+  // twice only compounds into lag.
+  const isScrubReady = useVideoScrubber(videoRef, scrollYProgress, { fps: 30 });
 
   // Fade out Scroll to Manufacture indicator by 10% scroll depth
   const indicatorOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
@@ -131,73 +127,27 @@ export default function CncScrollytelling() {
     setQuickLinksActive(latest > 0.82);
   });
 
-  // Throttled seeking mechanism to ensure maximum smoothness
-  useMotionValueEvent(smoothProgress, "change", (latest) => {
-    const video = videoRef.current;
-    if (!video || !videoDurationRef.current) return;
-
-    // Calculate targeted currentTime based on scroll position
-    targetTimeRef.current = latest * videoDurationRef.current;
-
-    // If the browser is not currently seeking, apply the new target time
-    if (!isSeekingRef.current) {
-      video.currentTime = targetTimeRef.current;
-      isSeekingRef.current = true;
-    }
-  });
-
-  // Setup seek event listeners and video preload handlers
+  // Loading readout: creep to 90% off readyState, then hand the last step to
+  // the scrubber's own readiness so the veil never lifts before the video can
+  // actually be scrubbed.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Simple loading progress simulator based on video readystate
+    if (isScrubReady) {
+      setLoadPercentage(100);
+      const settle = setTimeout(() => setIsReady(true), 300);
+      return () => clearTimeout(settle);
+    }
+
     const progressInterval = setInterval(() => {
       if (video.readyState >= 1) {
-        setLoadPercentage((prev) => {
-          if (prev >= 90) return prev;
-          return prev + 10;
-        });
+        setLoadPercentage((prev) => (prev >= 90 ? prev : prev + 10));
       }
     }, 100);
 
-    const handleLoadedMetadata = () => {
-      videoDurationRef.current = video.duration;
-      // Seek to beginning
-      video.currentTime = 0;
-    };
-
-    const handleCanPlayThrough = () => {
-      setLoadPercentage(100);
-      clearInterval(progressInterval);
-      setTimeout(() => {
-        setIsReady(true);
-      }, 300);
-    };
-
-    const handleSeeked = () => {
-      isSeekingRef.current = false;
-      // If the target time has moved significantly while seeking was active, seek to the new target
-      if (Math.abs(video.currentTime - targetTimeRef.current) > 0.01) {
-        video.currentTime = targetTimeRef.current;
-        isSeekingRef.current = true;
-      }
-    };
-
-    video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    video.addEventListener("canplaythrough", handleCanPlayThrough);
-    video.addEventListener("seeked", handleSeeked);
-
-    // Trigger explicit preload load
-    video.load();
-
-    return () => {
-      clearInterval(progressInterval);
-      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      video.removeEventListener("canplaythrough", handleCanPlayThrough);
-      video.removeEventListener("seeked", handleSeeked);
-    };
-  }, []);
+    return () => clearInterval(progressInterval);
+  }, [isScrubReady]);
 
   return (
     <div ref={containerRef} className="relative w-full h-[400vh] bg-[#050505]">

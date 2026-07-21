@@ -1,157 +1,130 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { animate, useMotionValueEvent, type MotionValue } from "framer-motion";
+import { type MotionValue } from "framer-motion";
 
 /**
- * Shared machinery for scroll-scrubbed video tours (parts + quality
- * sections). Videos must be encoded all-intra (every frame a keyframe) for
- * frame-accurate seeking — see the re-encode notes in the repo history.
+ * Shared machinery for scroll-scrubbed video tours (parts + quality sections).
+ *
+ * The source videos are all-intra (verified: no `stss` box, 240 samples over
+ * 10s at 24fps), so every frame is an independent seek target and scrubbing is
+ * cheap. All smoothing therefore lives here, in one rAF loop — never stack a
+ * `useSpring` on top of this or the two filters compound into visible lag.
  */
 
+type ScrubOptions = {
+  /** Source frame rate. Used to quantize seeks onto exact frame centers. */
+  fps?: number;
+  /**
+   * Exponential follow time-constant, seconds. Lower = tighter tracking.
+   * ~0.14 keeps the picture glued to the cursor while still absorbing the
+   * coarse ~100px jumps a mouse wheel emits.
+   */
+  smoothing?: number;
+};
+
 /**
- * Throttled video scrubber — maps a normalized 0..1 time MotionValue onto
- * video.currentTime, never issuing a new seek while one is in flight.
- * Returns readiness (video fully buffered for scrubbing).
+ * Frame-quantized video scrubber. Maps a normalized 0..1 MotionValue onto
+ * video.currentTime from a single requestAnimationFrame loop.
+ *
+ * Three things make this smooth where a naive scrubber stutters:
+ *   1. Seeks are quantized to frame centers, so a scroll delta that doesn't
+ *      cross a frame boundary issues no seek at all — the decoder isn't asked
+ *      to re-render a frame it's already showing.
+ *   2. Smoothing is frame-rate independent (exp decay on real dt), so it feels
+ *      identical on 60Hz and 144Hz displays.
+ *   3. An in-flight seek is abandoned after a deadline. Browsers coalesce and
+ *      occasionally drop `seeked`; without this the scrub freezes permanently.
+ *
+ * Returns readiness (video buffered enough to scrub).
  */
 export function useVideoScrubber(
   videoRef: RefObject<HTMLVideoElement>,
-  time: MotionValue<number>
+  time: MotionValue<number>,
+  { fps = 24, smoothing = 0.14 }: ScrubOptions = {}
 ) {
-  const durationRef = useRef(0);
-  const isSeekingRef = useRef(false);
-  const targetTimeRef = useRef(0);
   const [isReady, setIsReady] = useState(false);
-
-  useMotionValueEvent(time, "change", (latest) => {
-    const video = videoRef.current;
-    if (!video || !durationRef.current) return;
-
-    // Hold a hair before the last frame so the element never hits "ended"
-    targetTimeRef.current = Math.min(latest, 0.999) * durationRef.current;
-
-    if (!isSeekingRef.current) {
-      video.currentTime = targetTimeRef.current;
-      isSeekingRef.current = true;
-    }
-  });
+  // Keep the latest MotionValue reachable without re-running the rAF effect
+  const timeRef = useRef(time);
+  timeRef.current = time;
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    let raf = 0;
+    let frameCount = 0;
+    let current = timeRef.current.get();
+    let lastFrame = -1;
+    let seeking = false;
+    let seekIssuedAt = 0;
+    let lastTick = performance.now();
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
     const handleLoadedMetadata = () => {
-      durationRef.current = video.duration;
-      video.currentTime = 0;
+      frameCount = Math.max(1, Math.round((video.duration || 0) * fps));
+      current = timeRef.current.get();
+      lastFrame = -1;
     };
 
-    const handleCanPlayThrough = () => setIsReady(true);
-
+    const handleReady = () => setIsReady(true);
     const handleSeeked = () => {
-      isSeekingRef.current = false;
-      // Scroll moved on while we were seeking — chase the new target
-      if (Math.abs(video.currentTime - targetTimeRef.current) > 0.01) {
-        video.currentTime = targetTimeRef.current;
-        isSeekingRef.current = true;
-      }
+      seeking = false;
+    };
+
+    const tick = (now: number) => {
+      raf = requestAnimationFrame(tick);
+      if (!frameCount) return;
+
+      const dt = Math.min(0.1, (now - lastTick) / 1000);
+      lastTick = now;
+
+      const target = timeRef.current.get();
+      current = reduceMotion
+        ? target
+        : current + (target - current) * (1 - Math.exp(-dt / smoothing));
+      // Settle exactly, so a resting scroll can't leave a permanent epsilon
+      if (Math.abs(target - current) < 1e-4) current = target;
+
+      const frame = Math.min(
+        frameCount - 1,
+        Math.max(0, Math.round(current * (frameCount - 1)))
+      );
+      if (frame === lastFrame) return;
+
+      // Let one seek finish before issuing the next, but never wait forever
+      if (seeking && now - seekIssuedAt < 200) return;
+
+      lastFrame = frame;
+      seeking = true;
+      seekIssuedAt = now;
+      // Aim at the middle of the frame's interval — landing on the boundary
+      // is ambiguous and some decoders round the wrong way
+      video.currentTime = (frame + 0.5) / fps;
     };
 
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    video.addEventListener("canplaythrough", handleCanPlayThrough);
+    video.addEventListener("canplaythrough", handleReady);
     video.addEventListener("seeked", handleSeeked);
-    video.load();
+
+    // The element may already be loaded (fast cache, remount) — the events
+    // above would never fire again in that case
+    if (video.readyState >= 1) handleLoadedMetadata();
+    if (video.readyState >= 4) setIsReady(true);
+
+    raf = requestAnimationFrame(tick);
 
     return () => {
+      cancelAnimationFrame(raf);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      video.removeEventListener("canplaythrough", handleCanPlayThrough);
+      video.removeEventListener("canplaythrough", handleReady);
       video.removeEventListener("seeked", handleSeeked);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fps, smoothing]);
 
   return isReady;
-}
-
-/**
- * Magnetic snap: once the visitor stops scrolling inside the section, glide
- * the page to the nearest anchor (global 0..1 progress positions of sharp
- * showcase frames) so the resting frame is never a motion-blurred pan.
- * Any real user input interrupts the glide; reduced-motion users are exempt.
- */
-export function useMagneticSnap(
-  containerRef: RefObject<HTMLElement>,
-  anchors: number[]
-) {
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    let idleTimer: ReturnType<typeof setTimeout> | undefined;
-    let snapControls: ReturnType<typeof animate> | null = null;
-    let isSnapping = false;
-
-    const cancelSnap = () => {
-      if (snapControls) {
-        snapControls.stop();
-        snapControls = null;
-      }
-      isSnapping = false;
-    };
-
-    const snapToNearestAnchor = () => {
-      const total = el.offsetHeight - window.innerHeight;
-      if (total <= 0) return;
-      const scrolled = -el.getBoundingClientRect().top;
-      const p = scrolled / total;
-      // Let visitors enter and leave the section freely at its edges
-      if (p <= 0.01 || p >= 0.96) return;
-
-      let nearest = anchors[0];
-      for (const anchor of anchors) {
-        if (Math.abs(anchor - p) < Math.abs(nearest - p)) nearest = anchor;
-      }
-
-      const delta = (nearest - p) * total;
-      if (Math.abs(delta) < 4) return;
-
-      const startY = window.scrollY;
-      isSnapping = true;
-      snapControls = animate(startY, startY + delta, {
-        duration: Math.min(1.1, 0.45 + Math.abs(delta) / 2500),
-        ease: [0.22, 1, 0.36, 1],
-        onUpdate: (v) => window.scrollTo(0, v),
-        onComplete: () => {
-          isSnapping = false;
-          snapControls = null;
-        },
-      });
-    };
-
-    const handleScroll = () => {
-      if (isSnapping) return;
-      if (idleTimer) clearTimeout(idleTimer);
-      idleTimer = setTimeout(snapToNearestAnchor, 220);
-    };
-
-    // Real user input interrupts an in-flight snap immediately
-    const handleUserInput = () => cancelSnap();
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("wheel", handleUserInput, { passive: true });
-    window.addEventListener("touchstart", handleUserInput, { passive: true });
-    window.addEventListener("pointerdown", handleUserInput, { passive: true });
-    window.addEventListener("keydown", handleUserInput);
-
-    return () => {
-      if (idleTimer) clearTimeout(idleTimer);
-      cancelSnap();
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("wheel", handleUserInput);
-      window.removeEventListener("touchstart", handleUserInput);
-      window.removeEventListener("pointerdown", handleUserInput);
-      window.removeEventListener("keydown", handleUserInput);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 }

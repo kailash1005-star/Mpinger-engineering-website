@@ -4,25 +4,24 @@ import { useRef, useState } from "react";
 import {
   motion,
   useScroll,
-  useSpring,
   useTransform,
   useMotionValueEvent,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber, useMagneticSnap } from "./videoScroll";
+import { useVideoScrubber } from "./videoScroll";
 
 /**
  * Two-chapter scroll-driven parts showcase.
- * Scroll maps LINEARLY onto video time — scroll speed and camera motion match
- * 1:1, exactly like the hero scrollytelling — with a dip-through-black cut
- * between the chapters:
- *   Chapter 01 (0.00 – 0.46) — industrial components tour
- *   Chapter 02 (0.54 – 1.00) — aerospace tour
  *
- * The section is 800vh so each 10s video gets ~370vh of scroll — the same
- * scroll-per-second pacing as the hero. When the visitor stops scrolling,
- * the page settles onto the nearest sharp showcase frame (`holds`, from
- * per-frame motion analysis) so the resting frame is never a blurred pan.
+ * The section is 600vh — 500vh of actual scroll split evenly between two 240-
+ * frame tours, giving ~10px of scroll per frame so a single wheel notch advances
+ * a readable handful of frames rather than a jump cut.
+ *
+ * Scroll maps onto video time strictly monotonically: chapter A owns [0, 0.5],
+ * chapter B owns [0.5, 1], back to back with no gap. Scrolling down only ever
+ * moves footage forward. (An earlier magnetic-snap pass animated the page to the
+ * *nearest* showcase frame, which sat behind the visitor about half the time and
+ * played the video backwards to get there — hence no snapping here.)
  */
 
 const CHAPTERS = [
@@ -34,13 +33,7 @@ const CHAPTERS = [
     description:
       "Impeller hubs, gear cases, turbocharger housings and heavy-engine components — 5-axis milled and turned in a single setup, held to 0.001 mm discipline.",
     // scroll range this chapter's video scrubs across
-    scrub: [0.0, 0.46] as [number, number],
-    // sharp showcase ranges, normalized video time — snap targets
-    holds: [
-      [0, 0.14],
-      [0.54, 0.68],
-      [0.78, 1],
-    ] as [number, number][],
+    scrub: [0.0, 0.5] as [number, number],
     // beat sits on the opening showcase
     beat: [0.01, 0.045, 0.085, 0.13] as [number, number, number, number],
   },
@@ -51,26 +44,17 @@ const CHAPTERS = [
     title: "Aerospace-Grade Precision",
     description:
       "Flight-critical geometries in demanding alloys — machined, measured on calibrated CMMs and validated before a single part leaves the floor.",
-    scrub: [0.54, 1.0] as [number, number],
-    holds: [
-      [0.19, 0.29],
-      [0.34, 0.48],
-      [0.64, 0.74],
-      [0.79, 1],
-    ] as [number, number][],
-    // beat spans the first two showcases, after the opening pan has settled
+    scrub: [0.5, 1.0] as [number, number],
+    // beat sits on the first showcase, after the opening pan has settled
     beat: [0.625, 0.66, 0.75, 0.79] as [number, number, number, number],
   },
 ];
 
-// Global-progress positions of each sharp showcase's center — the only
-// places a scroll gesture is allowed to come to rest.
-const SNAP_ANCHORS = CHAPTERS.flatMap((chapter) =>
-  chapter.holds.map(
-    ([s, e]) =>
-      chapter.scrub[0] + ((s + e) / 2) * (chapter.scrub[1] - chapter.scrub[0])
-  )
-);
+// Cross-dissolve at the chapter seam. Deliberately tight (~1.5% of the section,
+// roughly 100px): while it runs, one video is clamped to its last frame and the
+// other to its first, so exactly one of them is seeking and neither the picture
+// nor the scroll ever parks on a frozen frame.
+const CUT = { aOut: [0.49, 0.505], bIn: [0.495, 0.51] };
 
 function ChapterBeat({
   chapter,
@@ -120,24 +104,19 @@ export default function PartsSection() {
     offset: ["start start", "end end"],
   });
 
-  // Smooth the raw scroll so seeks glide instead of stuttering — same
-  // spring as the hero scrollytelling
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 50,
-    damping: 20,
-    restDelta: 0.001,
-  });
-
-  // Per-chapter video time — a pure linear map of scroll position
-  const timeA = useTransform(smoothProgress, CHAPTERS[0].scrub, [0, 1]);
-  const timeB = useTransform(smoothProgress, CHAPTERS[1].scrub, [0, 1]);
+  // Per-chapter video time — a pure linear map of raw scroll position.
+  // No spring here: the scrubber's rAF loop does the smoothing, and filtering
+  // twice just compounds into lag you can see.
+  const timeA = useTransform(scrollYProgress, CHAPTERS[0].scrub, [0, 1], { clamp: true });
+  const timeB = useTransform(scrollYProgress, CHAPTERS[1].scrub, [0, 1], { clamp: true });
 
   const readyA = useVideoScrubber(videoARef, timeA);
   useVideoScrubber(videoBRef, timeB);
 
-  // Dip-through-black cut: only one video is ever composited at a time
-  const opacityA = useTransform(smoothProgress, [0.46, 0.49], [1, 0]);
-  const opacityB = useTransform(smoothProgress, [0.51, 0.54], [0, 1]);
+  // Cross-dissolve at the seam — driven by raw scroll so the cut lands exactly
+  // where the footage hands over
+  const opacityA = useTransform(scrollYProgress, CUT.aOut, [1, 0], { clamp: true });
+  const opacityB = useTransform(scrollYProgress, CUT.bIn, [0, 1], { clamp: true });
   const visibilityA = useTransform(opacityA, (v) => (v > 0.001 ? "visible" : "hidden"));
   const visibilityB = useTransform(opacityB, (v) => (v > 0.001 ? "visible" : "hidden"));
 
@@ -153,11 +132,8 @@ export default function PartsSection() {
     setActiveChapter(latest < 0.5 ? 0 : 1);
   });
 
-  // Settle onto the nearest sharp showcase whenever scrolling stops
-  useMagneticSnap(containerRef, SNAP_ANCHORS);
-
   return (
-    <section id="parts" ref={containerRef} className="relative w-full h-[800vh] bg-[#050505]">
+    <section id="parts" ref={containerRef} className="relative w-full h-[600vh] bg-[#050505]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-[#050505]">
         {/* Chapter 01 — industrial components tour */}
         <motion.video
@@ -200,7 +176,7 @@ export default function PartsSection() {
           </span>
         </motion.div>
 
-        {/* Minimal text beats — one per chapter, aligned to sharp holds */}
+        {/* Minimal text beats — one per chapter, timed to its steadiest pan */}
         {CHAPTERS.map((chapter) => (
           <ChapterBeat
             key={chapter.id}
