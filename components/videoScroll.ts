@@ -12,6 +12,83 @@ import { type MotionValue } from "framer-motion";
  * `useSpring` on top of this or the two filters compound into visible lag.
  */
 
+type SourcePair = {
+  /** Full-size encode, 1280x720. */
+  desktop: string;
+  /** 640x360 encode — a quarter of the decode cost and ~3.5x smaller. */
+  mobile: string;
+};
+
+/**
+ * Chooses a video encode for the device and withholds it until the section is
+ * close enough to matter.
+ *
+ * Scrub-driven video has to be *fully buffered* to work, so every one of these
+ * elements wants `preload="auto"` — which, applied to all four tours at once,
+ * means a first-time visitor pays ~36 MB before the hero is interactive. The
+ * fix is to leave `src` unset (an element with no source fetches nothing) and
+ * only assign it as the section approaches the viewport.
+ *
+ * Returns `undefined` until loading should begin; assign it straight to `src`.
+ */
+export function useAdaptiveVideoSource(
+  containerRef: RefObject<HTMLElement>,
+  sources: SourcePair,
+  /** Skip the viewport gate — for above-the-fold video that is needed at once. */
+  { eager = false }: { eager?: boolean } = {}
+): string | undefined {
+  const [src, setSrc] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    // Small viewport, an explicit data-saver request, or a slow radio all get
+    // the light encode. `connection` is Chromium-only, hence the loose typing.
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
+
+    const constrained =
+      window.matchMedia("(max-width: 767px)").matches ||
+      connection?.saveData === true ||
+      /^(slow-)?2g$|^3g$/.test(connection?.effectiveType ?? "");
+
+    const chosen = constrained ? sources.mobile : sources.desktop;
+
+    if (eager) {
+      setSrc(chosen);
+      return;
+    }
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    // No IntersectionObserver (very old browsers) — just load it.
+    if (typeof IntersectionObserver === "undefined") {
+      setSrc(chosen);
+      return;
+    }
+
+    // Two viewport-heights of runway: enough for a full buffer at typical
+    // scroll speeds, without competing with the hero for bandwidth on load.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSrc(chosen);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200% 0px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eager, sources.desktop, sources.mobile]);
+
+  return src;
+}
+
 type ScrubOptions = {
   /** Source frame rate. Used to quantize seeks onto exact frame centers. */
   fps?: number;

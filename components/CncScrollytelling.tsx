@@ -8,7 +8,9 @@ import {
   useMotionValueEvent,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber } from "./videoScroll";
+import { useVideoScrubber, useAdaptiveVideoSource } from "./videoScroll";
+
+const SOURCES = { desktop: "/video.mp4", mobile: "/video-mobile.mp4" };
 
 interface Beat {
   title: string;
@@ -115,6 +117,10 @@ export default function CncScrollytelling() {
   // twice only compounds into lag.
   const isScrubReady = useVideoScrubber(videoRef, scrollYProgress, { fps: 30 });
 
+  // Eager — this is the first thing on screen — but still device-aware, so a
+  // phone pulls 2.9 MB instead of 11 MB before the page becomes usable
+  const src = useAdaptiveVideoSource(containerRef, SOURCES, { eager: true });
+
   // Fade out Scroll to Manufacture indicator by 10% scroll depth
   const indicatorOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
   const indicatorY = useTransform(scrollYProgress, [0, 0.1], [0, 20]);
@@ -189,10 +195,13 @@ export default function CncScrollytelling() {
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center pointer-events-none">
         <video
           ref={videoRef}
-          src="/video.mp4"
+          src={src}
+          poster="/posters/hero.webp"
           preload="auto"
           muted
           playsInline
+          disablePictureInPicture
+          aria-hidden="true"
           className="w-full h-full object-contain pointer-events-none block max-w-full max-h-full"
           style={{ background: "#050505" }}
         />

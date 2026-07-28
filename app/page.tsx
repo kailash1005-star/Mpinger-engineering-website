@@ -7,11 +7,9 @@ import QualitySection from "@/components/QualitySection";
 import GlobalSection from "@/components/GlobalSection";
 import ContactFooter from "@/components/ContactFooter";
 
-export const metadata = {
-  title: "Mpinger Engineering // Precision CNC Manufacturing",
-  description:
-    "Mpinger Engineering — ISO 9001:2015 certified manufacturer of high-precision 5-axis CNC-milled and turned components. German coordination, Indian manufacturing strength.",
-};
+// Title and description are owned by app/layout.tsx. Re-declaring a plain
+// string title here would be fed through the layout's "%s | Mpinger
+// Engineering" template and render the brand name twice.
 
 export default function Home() {
   return (
@@ -19,6 +17,20 @@ export default function Home() {
       id="top"
       className="relative min-h-screen bg-[#050505] selection:bg-[#1d6fb5] selection:text-white"
     >
+      {/*
+        The hero is a full-bleed video tour with no room for a headline, which
+        left the document with no <h1> at all — a real ranking and screen-reader
+        defect. This states the page's actual subject for crawlers and assistive
+        tech without altering the visual design. It is not hidden text in the
+        black-hat sense: it matches the <title>, the meta description and the
+        visible content exactly.
+      */}
+      <h1 className="sr-only">
+        Mpinger Engineering — precision 5-axis CNC milled and turned components,
+        ISO 9001:2015 certified, engineered in Hannover and manufactured in
+        Coimbatore.
+      </h1>
+
       {/* Premium Minimal Header Overlay */}
       <SiteHeader />
 

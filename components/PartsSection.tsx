@@ -8,7 +8,8 @@ import {
   useMotionValueEvent,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber } from "./videoScroll";
+import { useVideoScrubber, useAdaptiveVideoSource } from "./videoScroll";
+import SectionTitleCard from "./SectionTitleCard";
 
 /**
  * Two-chapter scroll-driven parts showcase.
@@ -27,7 +28,11 @@ import { useVideoScrubber } from "./videoScroll";
 const CHAPTERS = [
   {
     id: "industrial",
-    src: "/parts/industrial-components.mp4",
+    src: {
+      desktop: "/parts/industrial-components.mp4",
+      mobile: "/parts/industrial-components-mobile.mp4",
+    },
+    poster: "/posters/industrial.webp",
     eyebrow: "What We Manufacture — 01",
     title: "Industrial Components",
     description:
@@ -39,7 +44,11 @@ const CHAPTERS = [
   },
   {
     id: "aerospace",
-    src: "/parts/aerospace-parts.mp4",
+    src: {
+      desktop: "/parts/aerospace-parts.mp4",
+      mobile: "/parts/aerospace-parts-mobile.mp4",
+    },
+    poster: "/posters/aerospace.webp",
     eyebrow: "What We Manufacture — 02",
     title: "Aerospace-Grade Precision",
     description:
@@ -110,6 +119,11 @@ export default function PartsSection() {
   const timeA = useTransform(scrollYProgress, CHAPTERS[0].scrub, [0, 1], { clamp: true });
   const timeB = useTransform(scrollYProgress, CHAPTERS[1].scrub, [0, 1], { clamp: true });
 
+  // Sources stay unset until the section is within ~2 screens, so the hero
+  // isn't competing with 16 MB of parts footage during first paint
+  const srcA = useAdaptiveVideoSource(containerRef, CHAPTERS[0].src);
+  const srcB = useAdaptiveVideoSource(containerRef, CHAPTERS[1].src);
+
   const readyA = useVideoScrubber(videoARef, timeA);
   useVideoScrubber(videoBRef, timeB);
 
@@ -133,16 +147,21 @@ export default function PartsSection() {
   });
 
   return (
-    <section id="parts" ref={containerRef} className="relative w-full h-[600vh] bg-[#050505]">
+    // Shorter tour on phones: a swipe covers a whole screen, so 600vh is six
+    // full gestures. Touch scrolling is continuous rather than notched, so the
+    // higher frames-per-pixel this implies is far less visible than on a wheel.
+    <section id="parts" ref={containerRef} className="relative w-full h-[400vh] md:h-[600vh] bg-[#050505]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-[#050505]">
         {/* Chapter 01 — industrial components tour */}
         <motion.video
           ref={videoARef}
-          src={CHAPTERS[0].src}
+          src={srcA}
+          poster={CHAPTERS[0].poster}
           preload="auto"
           muted
           playsInline
           disablePictureInPicture
+          aria-hidden="true"
           style={{ opacity: opacityA, visibility: visibilityA }}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
@@ -150,11 +169,13 @@ export default function PartsSection() {
         {/* Chapter 02 — aerospace tour */}
         <motion.video
           ref={videoBRef}
-          src={CHAPTERS[1].src}
+          src={srcB}
+          poster={CHAPTERS[1].poster}
           preload="auto"
           muted
           playsInline
           disablePictureInPicture
+          aria-hidden="true"
           style={{ opacity: opacityB, visibility: visibilityB }}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
@@ -163,6 +184,14 @@ export default function PartsSection() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_55%,rgba(5,5,5,0.9)_100%)] pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#050505]/90 to-transparent pointer-events-none" />
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#3f97dd]/10 to-transparent pointer-events-none" />
+
+        {/* Section title — clears as the tour begins */}
+        <SectionTitleCard
+          index="02"
+          eyebrow="What We Manufacture"
+          title="Parts"
+          scrollYProgress={scrollYProgress}
+        />
 
         {/* Loading veil until the first tour is scrub-ready */}
         <motion.div
@@ -216,6 +245,29 @@ export default function PartsSection() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Chapter rail — mobile equivalent of the desktop vertical rail */}
+        <div className="absolute top-0 inset-x-0 flex md:hidden items-center gap-2 px-4 pt-3 pointer-events-none">
+          {[timeA, timeB].map((progress, index) => (
+            <div
+              key={index}
+              className="relative h-[2px] flex-1 bg-white/15 rounded-full overflow-hidden"
+            >
+              <motion.div
+                style={{ scaleX: progress }}
+                className="absolute inset-0 bg-gradient-to-r from-[#3f97dd] to-[#7cbcf0] origin-left rounded-full"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="absolute top-6 left-4 flex md:hidden items-center space-x-2 pointer-events-none">
+          <span className="mono-font text-[8px] uppercase tracking-[0.3em] text-[#7cbcf0]">
+            {`0${activeChapter + 1}`}
+          </span>
+          <span className="mono-font text-[8px] uppercase tracking-[0.3em] text-white/50">
+            {activeChapter === 0 ? "Industrial" : "Aerospace"}
+          </span>
         </div>
 
         {/* Scroll hint */}

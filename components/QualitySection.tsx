@@ -7,7 +7,13 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber } from "./videoScroll";
+import { useVideoScrubber, useAdaptiveVideoSource } from "./videoScroll";
+import SectionTitleCard from "./SectionTitleCard";
+
+const SOURCES = {
+  desktop: "/parts/quality-equipment.mp4",
+  mobile: "/parts/quality-equipment-mobile.mp4",
+};
 
 /**
  * Scroll-driven quality-lab tour. Scroll maps linearly and monotonically onto
@@ -87,6 +93,8 @@ export default function QualitySection() {
     offset: ["start start", "end end"],
   });
 
+  const src = useAdaptiveVideoSource(containerRef, SOURCES);
+
   // Tighter follow than the 0.14 default: this tour must track the cursor
   // rather than trail it. The extra scroll room above (500vh) is what buys the
   // headroom to tighten — at a shorter section this would read as steppy.
@@ -99,7 +107,8 @@ export default function QualitySection() {
   const outroOpacity = useTransform(scrollYProgress, [0.93, 0.98], [0, 1]);
 
   return (
-    <section id="quality" ref={containerRef} className="relative w-full h-[500vh] bg-[#050505]">
+    // Shorter tour on phones — see the note in PartsSection
+    <section id="quality" ref={containerRef} className="relative w-full h-[350vh] md:h-[500vh] bg-[#050505]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-[#050505]">
         {/* The Parts tours get their own compositing layer for free, via the
             animated opacity on their motion.video. This one has no animated
@@ -107,11 +116,13 @@ export default function QualitySection() {
             the main thread along with the gradients stacked over it. */}
         <video
           ref={videoRef}
-          src="/parts/quality-equipment.mp4"
+          src={src}
+          poster="/posters/quality.webp"
           preload="auto"
           muted
           playsInline
           disablePictureInPicture
+          aria-hidden="true"
           style={{ transform: "translateZ(0)", willChange: "transform" }}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
@@ -120,6 +131,15 @@ export default function QualitySection() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_55%,rgba(5,5,5,0.9)_100%)] pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#050505]/90 to-transparent pointer-events-none" />
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#3f97dd]/10 to-transparent pointer-events-none" />
+
+        {/* Section title — centered, clears as the tour begins */}
+        <SectionTitleCard
+          index="05"
+          eyebrow="Metrology & Validation"
+          title="Quality"
+          scrollYProgress={scrollYProgress}
+          align="center"
+        />
 
         {/* Loading veil until the tour is scrub-ready */}
         <motion.div
@@ -152,6 +172,16 @@ export default function QualitySection() {
             <motion.div
               style={{ scaleY: scrollYProgress }}
               className="absolute inset-0 bg-gradient-to-b from-[#3f97dd] to-[#7cbcf0] origin-top rounded-full"
+            />
+          </div>
+        </div>
+
+        {/* Progress rail — mobile equivalent of the desktop vertical rail */}
+        <div className="absolute top-0 inset-x-0 flex md:hidden px-4 pt-3 pointer-events-none">
+          <div className="relative h-[2px] flex-1 bg-white/15 rounded-full overflow-hidden">
+            <motion.div
+              style={{ scaleX: scrollYProgress }}
+              className="absolute inset-0 bg-gradient-to-r from-[#3f97dd] to-[#7cbcf0] origin-left rounded-full"
             />
           </div>
         </div>
