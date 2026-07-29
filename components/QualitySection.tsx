@@ -20,7 +20,7 @@ const SOURCES = {
   mobile: "/parts/quality-equipment-mobile.mp4",
 };
 const FRAMES = Array.from(
-  { length: 8 },
+  { length: 24 },
   (_, i) => `/frames/quality-${i + 1}.webp`
 );
 
@@ -129,6 +129,9 @@ export default function QualitySection() {
             progress={scrollYProgress}
             frames={FRAMES}
             alt="Metrology lab — calibrated CMM inspection of machined components"
+            // Desktop uses object-cover here, so mobile must too
+            fit="cover"
+            smoothing={0.06}
           />
         ) : (
           <video

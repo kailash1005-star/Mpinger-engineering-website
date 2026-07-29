@@ -17,7 +17,7 @@ import SectionTitleCard from "./SectionTitleCard";
 import ScrollImageSequence from "./ScrollImageSequence";
 
 const seq = (name: string) =>
-  Array.from({ length: 8 }, (_, i) => `/frames/${name}-${i + 1}.webp`);
+  Array.from({ length: 24 }, (_, i) => `/frames/${name}-${i + 1}.webp`);
 
 /**
  * Two-chapter scroll-driven parts showcase.
@@ -176,6 +176,7 @@ export default function PartsSection() {
                 progress={timeA}
                 frames={CHAPTERS[0].frames}
                 alt={CHAPTERS[0].title}
+                fit="cover"
               />
             </motion.div>
 
@@ -188,6 +189,7 @@ export default function PartsSection() {
                 progress={timeB}
                 frames={CHAPTERS[1].frames}
                 alt={CHAPTERS[1].title}
+                fit="cover"
               />
             </motion.div>
           </>

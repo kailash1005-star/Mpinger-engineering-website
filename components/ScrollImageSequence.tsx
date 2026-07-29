@@ -1,101 +1,195 @@
 "use client";
 
-import { motion, useTransform, type MotionValue } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { type MotionValue } from "framer-motion";
 
 /**
- * Scroll-driven image sequence — the mobile replacement for scrubbed video.
+ * Canvas-rendered scroll sequence — the mobile replacement for scrubbed video.
  *
- * Scrub-video cannot be made reliable on phones. iOS refuses to buffer a video
- * that has never played, ignores `currentTime` until it has, blocks muted
- * autoplay outright in Low Power Mode, and caps how many elements may hold a
- * decode pipeline at once. Any one of those leaves a black rectangle where the
- * footage should be, and none of them are detectable up front.
+ * Scrub-video cannot be made reliable on phones. iOS will not buffer a video it
+ * has never played, ignores `currentTime` until it has, refuses muted autoplay
+ * outright in Low Power Mode, and caps how many elements may hold a decode
+ * pipeline. Any one of those leaves a black rectangle, and none are detectable
+ * up front.
  *
- * Stacked stills cross-faded by scroll have none of those failure modes: they
- * are just images. The whole sequence is ~250 KB against 2.3 MB for the video,
- * every frame is cached by the CDN, and the only per-frame work is compositing
- * opacity — which runs off the main thread.
+ * Drawing pre-decoded stills to a single canvas has none of those failure
+ * modes, and unlike a stack of cross-faded <img> layers it:
+ *   - blends two adjacent frames per paint, so 24 stills read as continuous
+ *     motion rather than a slideshow;
+ *   - keeps one compositor layer instead of 24, which matters on low-end
+ *     Android where layer memory is the constraint;
+ *   - reproduces `object-fit` exactly, so mobile framing matches the desktop
+ *     video instead of hard-cropping a 16:9 shot into a portrait viewport.
  */
-
-function Frame({
-  src,
-  index,
-  count,
-  progress,
-  alt,
-  eager,
-}: {
-  src: string;
-  index: number;
-  count: number;
-  progress: MotionValue<number>;
-  alt: string;
-  eager: boolean;
-}) {
-  const step = 1 / (count - 1);
-  const center = index * step;
-
-  // Each still owns a window either side of its centre and cross-fades with
-  // its neighbours. First and last hold to the section edges so the sequence
-  // never fades out to black at either end.
-  const opacity = useTransform(
-    progress,
-    [
-      index === 0 ? -1 : center - step,
-      center,
-      index === count - 1 ? 2 : center + step,
-    ],
-    [0, 1, 0]
-  );
-
-  return (
-    <motion.img
-      src={src}
-      alt={alt}
-      // eslint-disable-next-line @next/next/no-img-element
-      loading={eager ? "eager" : "lazy"}
-      decoding="async"
-      fetchPriority={eager ? "high" : "auto"}
-      style={{ opacity }}
-      className="absolute inset-0 w-full h-full object-cover"
-    />
-  );
-}
-
 export default function ScrollImageSequence({
   progress,
   frames,
   alt,
-  eager = false,
+  fit = "contain",
+  smoothing = 0.12,
+  onReady,
 }: {
   progress: MotionValue<number>;
   /** Ordered stills, first to last. */
   frames: string[];
   alt: string;
-  /** Load the opening frame at high priority — for above-the-fold use. */
-  eager?: boolean;
+  /** Must match the desktop video's object-fit so composition is identical. */
+  fit?: "contain" | "cover";
+  /** Exponential follow constant, seconds. Mirrors the video scrubber. */
+  smoothing?: number;
+  onReady?: () => void;
 }) {
-  // Slow push-in across the section. A single compositor transform, so it
-  // costs nothing and keeps the sequence from reading as a slideshow.
-  const scale = useTransform(progress, [0, 1], [1.08, 1]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const progressRef = useRef(progress);
+  progressRef.current = progress;
+  const readyRef = useRef(onReady);
+  readyRef.current = onReady;
+
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
+
+    const images = frames.map((src) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+      return img;
+    });
+
+    let raf = 0;
+    let current = progressRef.current.get();
+    let lastKey = "";
+    let lastTick = performance.now();
+    let announced = false;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const resize = () => {
+      // Cap DPR at 2: beyond that the extra fill rate costs more than it shows
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width * dpr));
+      const h = Math.max(1, Math.round(rect.height * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        lastKey = ""; // force a repaint at the new size
+      }
+    };
+
+    /** Reproduces CSS object-fit, centred. */
+    const paint = (img: HTMLImageElement, alpha: number) => {
+      if (!img.complete || !img.naturalWidth) return false;
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const scale =
+        fit === "cover"
+          ? Math.max(cw / img.naturalWidth, ch / img.naturalHeight)
+          : Math.min(cw / img.naturalWidth, ch / img.naturalHeight);
+      const w = img.naturalWidth * scale;
+      const h = img.naturalHeight * scale;
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+      ctx.globalAlpha = 1;
+      return true;
+    };
+
+    /** Nearest decoded frame, so an undecoded index never paints nothing. */
+    const nearestLoaded = (index: number) => {
+      for (let d = 0; d < images.length; d++) {
+        const before = images[index - d];
+        if (before?.complete && before.naturalWidth) return before;
+        const after = images[index + d];
+        if (after?.complete && after.naturalWidth) return after;
+      }
+      return null;
+    };
+
+    const tick = (now: number) => {
+      raf = requestAnimationFrame(tick);
+      resize();
+
+      const dt = Math.min(0.1, (now - lastTick) / 1000);
+      lastTick = now;
+
+      const target = progressRef.current.get();
+      current = reduceMotion
+        ? target
+        : current + (target - current) * (1 - Math.exp(-dt / smoothing));
+      if (Math.abs(target - current) < 1e-4) current = target;
+
+      const clamped = Math.max(0, Math.min(1, current));
+      const exact = clamped * (frames.length - 1);
+      const base = Math.floor(exact);
+      const next = Math.min(frames.length - 1, base + 1);
+      const blend = exact - base;
+
+      // Quantize the blend so tiny scroll jitter doesn't force a repaint
+      const key = `${base}:${Math.round(blend * 12)}:${canvas.width}`;
+      if (key === lastKey) return;
+      lastKey = key;
+
+      const primary = nearestLoaded(base);
+      if (!primary) return;
+
+      ctx.fillStyle = "#050505";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      paint(primary, 1);
+      // Blending the neighbour is what turns 24 stills into continuous motion
+      if (blend > 0.01 && next !== base) {
+        const upcoming = images[next];
+        if (upcoming?.complete && upcoming.naturalWidth) paint(upcoming, blend);
+      }
+
+      if (!announced) {
+        announced = true;
+        setIsReady(true);
+        readyRef.current?.();
+      }
+    };
+
+    resize();
+    raf = requestAnimationFrame(tick);
+    window.addEventListener("resize", resize);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+      images.forEach((img) => {
+        img.onload = null;
+        img.src = "";
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frames, fit, smoothing]);
 
   return (
-    <motion.div
-      style={{ scale }}
-      className="absolute inset-0 overflow-hidden will-change-transform"
-    >
-      {frames.map((src, index) => (
-        <Frame
-          key={src}
-          src={src}
-          index={index}
-          count={frames.length}
-          progress={progress}
-          // One descriptive alt for the sequence; the rest are decorative
-          alt={index === 0 ? alt : ""}
-          eager={eager && index === 0}
+    <div className="absolute inset-0 bg-[#050505]">
+      <canvas
+        ref={canvasRef}
+        aria-label={alt}
+        role="img"
+        className="absolute inset-0 w-full h-full"
+      />
+      {/* Holds the frame until the first paint lands, so the section never
+          flashes an empty canvas on a slow connection. */}
+      {!isReady && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={frames[0]}
+          alt={alt}
+          fetchPriority="high"
+          className={`absolute inset-0 w-full h-full ${
+            fit === "cover" ? "object-cover" : "object-contain"
+          }`}
         />
-      ))}
-    </motion.div>
+      )}
+    </div>
   );
 }

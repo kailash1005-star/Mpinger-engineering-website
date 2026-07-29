@@ -16,7 +16,7 @@ import {
 import ScrollImageSequence from "./ScrollImageSequence";
 
 const SOURCES = { desktop: "/video.mp4", mobile: "/video-mobile.mp4" };
-const FRAMES = Array.from({ length: 8 }, (_, i) => `/frames/hero-${i + 1}.webp`);
+const FRAMES = Array.from({ length: 24 }, (_, i) => `/frames/hero-${i + 1}.webp`);
 
 interface Beat {
   title: string;
@@ -100,14 +100,23 @@ function BeatOverlay({
   return (
     <motion.div
       style={{ opacity, y }}
-      className="absolute max-w-2xl text-center flex flex-col items-center space-y-4"
+      className="absolute inset-x-0 flex justify-center px-6"
     >
-      <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white/90 uppercase leading-none">
-        {beat.title}
-      </h3>
-      <p className="text-sm md:text-base font-normal text-white/60 max-w-lg leading-relaxed text-balance">
-        {beat.subtitle}
-      </p>
+      {/* The copy sits over the brightest part of the footage. On desktop the
+          vignette is enough; on a phone the frame fills far more of the screen,
+          so the text needs its own scrim to stay legible. */}
+      <div className="relative max-w-2xl text-center flex flex-col items-center space-y-4 py-8 px-6">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -mx-4 rounded-3xl bg-[#050505]/55 backdrop-blur-[2px] md:bg-transparent md:backdrop-blur-none"
+        />
+        <h3 className="relative text-3xl md:text-5xl font-extrabold tracking-tight text-white uppercase leading-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.8)]">
+          {beat.title}
+        </h3>
+        <p className="relative text-sm md:text-base font-normal text-white/75 md:text-white/60 max-w-lg leading-relaxed text-balance">
+          {beat.subtitle}
+        </p>
+      </div>
     </motion.div>
   );
 }
@@ -226,7 +235,9 @@ export default function CncScrollytelling() {
             progress={scrollYProgress}
             frames={FRAMES}
             alt="5-axis CNC machining sequence — simulation through finished component"
-            eager
+            // Matches the desktop video's object-contain, so the composed 16:9
+            // shot is never hard-cropped into a portrait viewport
+            fit="contain"
           />
         ) : (
           <video
