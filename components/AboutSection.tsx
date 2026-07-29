@@ -55,7 +55,12 @@ function StatCounter({ value, suffix }: { value: number; suffix: string }) {
   });
 
   return (
-    <span ref={ref} className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
+    // Kept on one line on small screens: at text-4xl a value like "11,000 ft²"
+    // wrapped its unit onto a second row and doubled the card's height.
+    <span
+      ref={ref}
+      className="text-2xl md:text-5xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap"
+    >
       {display}
       <span className="text-[#1d6fb5]">{suffix}</span>
     </span>
@@ -139,7 +144,7 @@ export default function AboutSection() {
         </div>
 
         {/* Stats strip */}
-        <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-10 md:mt-14 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {STATS.map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -147,10 +152,11 @@ export default function AboutSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-[#f3f6fa] p-7 flex flex-col space-y-2 hover:border-[#3f97dd]/60 transition-colors duration-300"
+              className="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-[#f3f6fa] p-4 md:p-7 flex flex-col space-y-1.5 md:space-y-2 hover:border-[#3f97dd]/60 transition-colors duration-300"
             >
               <StatCounter value={stat.value} suffix={stat.suffix} />
-              <span className="mono-font text-[9px] uppercase tracking-[0.25em] text-slate-500 leading-relaxed">
+              {/* Wide tracking pushed short labels onto three lines on a phone */}
+              <span className="mono-font text-[9px] uppercase tracking-[0.12em] md:tracking-[0.25em] text-slate-500 leading-snug md:leading-relaxed">
                 {stat.label}
               </span>
             </motion.div>

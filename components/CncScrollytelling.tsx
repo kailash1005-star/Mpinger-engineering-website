@@ -106,9 +106,13 @@ function BeatOverlay({
           vignette is enough; on a phone the frame fills far more of the screen,
           so the text needs its own scrim to stay legible. */}
       <div className="relative max-w-2xl text-center flex flex-col items-center space-y-3 md:space-y-4 py-5 md:py-8 px-5 md:px-6">
+        {/* A flat panel with rounded corners read as a box pasted over the
+            footage. A radial falloff to fully transparent has no edge to see,
+            so the copy gains contrast without anything appearing on top of the
+            image. Desktop keeps relying on the section vignette alone. */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 -mx-2 rounded-2xl bg-[#050505]/45 md:bg-transparent"
+          className="absolute -inset-x-8 -inset-y-4 bg-[radial-gradient(ellipse_at_center,rgba(5,5,5,0.78)_0%,rgba(5,5,5,0.55)_40%,rgba(5,5,5,0.18)_68%,rgba(5,5,5,0)_82%)] md:hidden"
         />
         <h3 className="relative text-[26px] md:text-5xl font-extrabold tracking-tight text-white uppercase leading-[1.05] md:leading-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.85)]">
           {beat.title}
