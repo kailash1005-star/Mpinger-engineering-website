@@ -17,7 +17,7 @@ import SectionTitleCard from "./SectionTitleCard";
 import ScrollImageSequence from "./ScrollImageSequence";
 
 const seq = (name: string) =>
-  Array.from({ length: 24 }, (_, i) => `/frames-portrait/${name}-${i + 1}.webp`);
+  Array.from({ length: 48 }, (_, i) => `/frames-portrait/${name}-${i + 1}.webp`);
 
 /**
  * Two-chapter scroll-driven parts showcase.
@@ -160,10 +160,10 @@ export default function PartsSection() {
   });
 
   return (
-    // Shorter tour on phones: a swipe covers a whole screen, so 600vh is six
-    // full gestures. Touch scrolling is continuous rather than notched, so the
-    // higher frames-per-pixel this implies is far less visible than on a wheel.
-    <section id="parts" ref={containerRef} className="relative w-full h-[400vh] md:h-[600vh] bg-[#050505]">
+    // Two chapters share this section, so on mobile each gets half the scroll
+    // the hero has for a comparable sequence. 550vh restores roughly the hero's
+    // pace per chapter, which matters here because the footage is a fast pan.
+    <section id="parts" ref={containerRef} className="relative w-full h-[550vh] md:h-[600vh] bg-[#050505]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-[#050505]">
         {isTouch ? (
           <>

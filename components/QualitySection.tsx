@@ -20,7 +20,7 @@ const SOURCES = {
   mobile: "/parts/quality-equipment-mobile.mp4",
 };
 const FRAMES = Array.from(
-  { length: 24 },
+  { length: 48 },
   (_, i) => `/frames-portrait/quality-${i + 1}.webp`
 );
 
@@ -117,8 +117,9 @@ export default function QualitySection() {
   const outroOpacity = useTransform(scrollYProgress, [0.93, 0.98], [0, 1]);
 
   return (
-    // Shorter tour on phones — see the note in PartsSection
-    <section id="quality" ref={containerRef} className="relative w-full h-[350vh] md:h-[500vh] bg-[#050505]">
+    // Fast-panning footage needs scroll room to read as motion rather than
+    // jump cuts — see the note in PartsSection
+    <section id="quality" ref={containerRef} className="relative w-full h-[450vh] md:h-[500vh] bg-[#050505]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-[#050505]">
         {/* The Parts tours get their own compositing layer for free, via the
             animated opacity on their motion.video. This one has no animated
