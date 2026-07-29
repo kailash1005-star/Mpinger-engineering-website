@@ -17,7 +17,7 @@ import SectionTitleCard from "./SectionTitleCard";
 import ScrollImageSequence from "./ScrollImageSequence";
 
 const seq = (name: string) =>
-  Array.from({ length: 24 }, (_, i) => `/frames/${name}-${i + 1}.webp`);
+  Array.from({ length: 24 }, (_, i) => `/frames-portrait/${name}-${i + 1}.webp`);
 
 /**
  * Two-chapter scroll-driven parts showcase.
@@ -103,10 +103,10 @@ function ChapterBeat({
       <span className="mono-font text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#7cbcf0] font-semibold">
         {chapter.eyebrow}
       </span>
-      <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white/95 uppercase leading-[0.95]">
+      <h3 className="text-[26px] md:text-5xl font-extrabold tracking-tight text-white/95 uppercase leading-[1.02] md:leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.85)]">
         {chapter.title}
       </h3>
-      <p className="text-sm md:text-base text-white/60 leading-relaxed text-balance">
+      <p className="text-[13px] md:text-base text-white/70 md:text-white/60 leading-relaxed text-balance drop-shadow-[0_1px_10px_rgba(0,0,0,0.8)]">
         {chapter.description}
       </p>
     </motion.div>

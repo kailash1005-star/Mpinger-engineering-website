@@ -16,7 +16,7 @@ import {
 import ScrollImageSequence from "./ScrollImageSequence";
 
 const SOURCES = { desktop: "/video.mp4", mobile: "/video-mobile.mp4" };
-const FRAMES = Array.from({ length: 24 }, (_, i) => `/frames/hero-${i + 1}.webp`);
+const FRAMES = Array.from({ length: 24 }, (_, i) => `/frames-portrait/hero-${i + 1}.webp`);
 
 interface Beat {
   title: string;
@@ -105,15 +105,15 @@ function BeatOverlay({
       {/* The copy sits over the brightest part of the footage. On desktop the
           vignette is enough; on a phone the frame fills far more of the screen,
           so the text needs its own scrim to stay legible. */}
-      <div className="relative max-w-2xl text-center flex flex-col items-center space-y-4 py-8 px-6">
+      <div className="relative max-w-2xl text-center flex flex-col items-center space-y-3 md:space-y-4 py-5 md:py-8 px-5 md:px-6">
         <div
           aria-hidden="true"
-          className="absolute inset-0 -mx-4 rounded-3xl bg-[#050505]/55 backdrop-blur-[2px] md:bg-transparent md:backdrop-blur-none"
+          className="absolute inset-0 -mx-2 rounded-2xl bg-[#050505]/45 md:bg-transparent"
         />
-        <h3 className="relative text-3xl md:text-5xl font-extrabold tracking-tight text-white uppercase leading-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.8)]">
+        <h3 className="relative text-[26px] md:text-5xl font-extrabold tracking-tight text-white uppercase leading-[1.05] md:leading-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.85)]">
           {beat.title}
         </h3>
-        <p className="relative text-sm md:text-base font-normal text-white/75 md:text-white/60 max-w-lg leading-relaxed text-balance">
+        <p className="relative text-[13px] md:text-base font-normal text-white/75 md:text-white/60 max-w-[19rem] md:max-w-lg leading-relaxed text-balance drop-shadow-[0_1px_10px_rgba(0,0,0,0.8)]">
           {beat.subtitle}
         </p>
       </div>
@@ -235,9 +235,10 @@ export default function CncScrollytelling() {
             progress={scrollYProgress}
             frames={FRAMES}
             alt="5-axis CNC machining sequence — simulation through finished component"
-            // Matches the desktop video's object-contain, so the composed 16:9
-            // shot is never hard-cropped into a portrait viewport
-            fit="contain"
+            // Frames are pre-cropped to 3:4, so cover fills a portrait screen
+            // without letterboxing and without the extreme zoom a 16:9 source
+            // would suffer here
+            fit="cover"
           />
         ) : (
           <video
