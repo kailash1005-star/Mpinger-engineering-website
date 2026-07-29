@@ -8,8 +8,16 @@ import {
   useMotionValueEvent,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber, useAdaptiveVideoSource } from "./videoScroll";
+import {
+  useVideoScrubber,
+  useAdaptiveVideoSource,
+  useTouchRenderer,
+} from "./videoScroll";
 import SectionTitleCard from "./SectionTitleCard";
+import ScrollImageSequence from "./ScrollImageSequence";
+
+const seq = (name: string) =>
+  Array.from({ length: 8 }, (_, i) => `/frames/${name}-${i + 1}.webp`);
 
 /**
  * Two-chapter scroll-driven parts showcase.
@@ -33,6 +41,7 @@ const CHAPTERS = [
       mobile: "/parts/industrial-components-mobile.mp4",
     },
     poster: "/posters/industrial.webp",
+    frames: seq("industrial"),
     eyebrow: "What We Manufacture — 01",
     title: "Industrial Components",
     description:
@@ -49,6 +58,7 @@ const CHAPTERS = [
       mobile: "/parts/aerospace-parts-mobile.mp4",
     },
     poster: "/posters/aerospace.webp",
+    frames: seq("aerospace"),
     eyebrow: "What We Manufacture — 02",
     title: "Aerospace-Grade Precision",
     description:
@@ -119,6 +129,9 @@ export default function PartsSection() {
   const timeA = useTransform(scrollYProgress, CHAPTERS[0].scrub, [0, 1], { clamp: true });
   const timeB = useTransform(scrollYProgress, CHAPTERS[1].scrub, [0, 1], { clamp: true });
 
+  // Touch devices get image sequences; no video is requested there at all
+  const isTouch = useTouchRenderer();
+
   // Sources stay unset until the section is within ~2 screens, so the hero
   // isn't competing with 16 MB of parts footage during first paint
   const srcA = useAdaptiveVideoSource(containerRef, CHAPTERS[0].src);
@@ -152,33 +165,63 @@ export default function PartsSection() {
     // higher frames-per-pixel this implies is far less visible than on a wheel.
     <section id="parts" ref={containerRef} className="relative w-full h-[400vh] md:h-[600vh] bg-[#050505]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden bg-[#050505]">
-        {/* Chapter 01 — industrial components tour */}
-        <motion.video
-          ref={videoARef}
-          src={srcA}
-          poster={CHAPTERS[0].poster}
-          preload="auto"
-          muted
-          playsInline
-          disablePictureInPicture
-          aria-hidden="true"
-          style={{ opacity: opacityA, visibility: visibilityA }}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        />
+        {isTouch ? (
+          <>
+            {/* Chapter 01 — industrial */}
+            <motion.div
+              style={{ opacity: opacityA, visibility: visibilityA }}
+              className="absolute inset-0"
+            >
+              <ScrollImageSequence
+                progress={timeA}
+                frames={CHAPTERS[0].frames}
+                alt={CHAPTERS[0].title}
+              />
+            </motion.div>
 
-        {/* Chapter 02 — aerospace tour */}
-        <motion.video
-          ref={videoBRef}
-          src={srcB}
-          poster={CHAPTERS[1].poster}
-          preload="auto"
-          muted
-          playsInline
-          disablePictureInPicture
-          aria-hidden="true"
-          style={{ opacity: opacityB, visibility: visibilityB }}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        />
+            {/* Chapter 02 — aerospace */}
+            <motion.div
+              style={{ opacity: opacityB, visibility: visibilityB }}
+              className="absolute inset-0"
+            >
+              <ScrollImageSequence
+                progress={timeB}
+                frames={CHAPTERS[1].frames}
+                alt={CHAPTERS[1].title}
+              />
+            </motion.div>
+          </>
+        ) : (
+          <>
+            {/* Chapter 01 — industrial components tour */}
+            <motion.video
+              ref={videoARef}
+              src={srcA}
+              poster={CHAPTERS[0].poster}
+              preload="auto"
+              muted
+              playsInline
+              disablePictureInPicture
+              aria-hidden="true"
+              style={{ opacity: opacityA, visibility: visibilityA }}
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            />
+
+            {/* Chapter 02 — aerospace tour */}
+            <motion.video
+              ref={videoBRef}
+              src={srcB}
+              poster={CHAPTERS[1].poster}
+              preload="auto"
+              muted
+              playsInline
+              disablePictureInPicture
+              aria-hidden="true"
+              style={{ opacity: opacityB, visibility: visibilityB }}
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            />
+          </>
+        )}
 
         {/* Cinematic vignette + top hairline, matching the hero language */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_55%,rgba(5,5,5,0.9)_100%)] pointer-events-none" />
@@ -196,7 +239,8 @@ export default function PartsSection() {
         {/* Loading veil until the first tour is scrub-ready */}
         <motion.div
           initial={false}
-          animate={{ opacity: readyA ? 0 : 1 }}
+          // Image sequences need no buffering, so the veil never applies there
+          animate={{ opacity: isTouch || readyA ? 0 : 1 }}
           transition={{ duration: 0.6 }}
           className="absolute inset-0 bg-[#050505] flex items-center justify-center pointer-events-none"
         >

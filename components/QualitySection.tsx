@@ -7,13 +7,22 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber, useAdaptiveVideoSource } from "./videoScroll";
+import {
+  useVideoScrubber,
+  useAdaptiveVideoSource,
+  useTouchRenderer,
+} from "./videoScroll";
 import SectionTitleCard from "./SectionTitleCard";
+import ScrollImageSequence from "./ScrollImageSequence";
 
 const SOURCES = {
   desktop: "/parts/quality-equipment.mp4",
   mobile: "/parts/quality-equipment-mobile.mp4",
 };
+const FRAMES = Array.from(
+  { length: 8 },
+  (_, i) => `/frames/quality-${i + 1}.webp`
+);
 
 /**
  * Scroll-driven quality-lab tour. Scroll maps linearly and monotonically onto
@@ -93,6 +102,7 @@ export default function QualitySection() {
     offset: ["start start", "end end"],
   });
 
+  const isTouch = useTouchRenderer();
   const src = useAdaptiveVideoSource(containerRef, SOURCES);
 
   // Tighter follow than the 0.14 default: this tour must track the cursor
@@ -114,18 +124,26 @@ export default function QualitySection() {
             animated opacity on their motion.video. This one has no animated
             style, so promote it explicitly — otherwise each seek can repaint on
             the main thread along with the gradients stacked over it. */}
-        <video
-          ref={videoRef}
-          src={src}
-          poster="/posters/quality.webp"
-          preload="auto"
-          muted
-          playsInline
-          disablePictureInPicture
-          aria-hidden="true"
-          style={{ transform: "translateZ(0)", willChange: "transform" }}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        />
+        {isTouch ? (
+          <ScrollImageSequence
+            progress={scrollYProgress}
+            frames={FRAMES}
+            alt="Metrology lab — calibrated CMM inspection of machined components"
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={src}
+            poster="/posters/quality.webp"
+            preload="auto"
+            muted
+            playsInline
+            disablePictureInPicture
+            aria-hidden="true"
+            style={{ transform: "translateZ(0)", willChange: "transform" }}
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          />
+        )}
 
         {/* Cinematic vignette + top hairline, matching the hero language */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_55%,rgba(5,5,5,0.9)_100%)] pointer-events-none" />
@@ -144,7 +162,8 @@ export default function QualitySection() {
         {/* Loading veil until the tour is scrub-ready */}
         <motion.div
           initial={false}
-          animate={{ opacity: isReady ? 0 : 1 }}
+          // Image sequences need no buffering, so the veil never applies there
+          animate={{ opacity: isTouch || isReady ? 0 : 1 }}
           transition={{ duration: 0.6 }}
           className="absolute inset-0 bg-[#050505] flex items-center justify-center pointer-events-none"
         >

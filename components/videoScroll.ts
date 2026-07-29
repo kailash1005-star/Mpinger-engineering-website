@@ -12,6 +12,31 @@ import { type MotionValue } from "framer-motion";
  * `useSpring` on top of this or the two filters compound into visible lag.
  */
 
+/**
+ * True on devices that should get the image-sequence renderer instead of
+ * scrubbed video — see ScrollImageSequence for why video is not viable there.
+ *
+ * Keyed on pointer type rather than width alone: a touch-primary device fails
+ * the same way at any size, and this resolves identically on iOS and Android.
+ * `undefined` until mounted, so callers can hold the poster during hydration
+ * rather than committing to the wrong renderer on the server.
+ */
+export function useTouchRenderer(): boolean | undefined {
+  const [isTouch, setIsTouch] = useState<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    const query = window.matchMedia(
+      "(max-width: 767px), (pointer: coarse) and (max-width: 1280px)"
+    );
+    const update = () => setIsTouch(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  return isTouch;
+}
+
 type SourcePair = {
   /** Full-size encode, 1280x720. */
   desktop: string;

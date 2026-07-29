@@ -8,9 +8,15 @@ import {
   useMotionValueEvent,
   type MotionValue,
 } from "framer-motion";
-import { useVideoScrubber, useAdaptiveVideoSource } from "./videoScroll";
+import {
+  useVideoScrubber,
+  useAdaptiveVideoSource,
+  useTouchRenderer,
+} from "./videoScroll";
+import ScrollImageSequence from "./ScrollImageSequence";
 
 const SOURCES = { desktop: "/video.mp4", mobile: "/video-mobile.mp4" };
+const FRAMES = Array.from({ length: 8 }, (_, i) => `/frames/hero-${i + 1}.webp`);
 
 interface Beat {
   title: string;
@@ -125,8 +131,11 @@ export default function CncScrollytelling() {
   // twice only compounds into lag.
   const isScrubReady = useVideoScrubber(videoRef, scrollYProgress, { fps: 30 });
 
+  // Touch devices get the image sequence; video never loads there at all
+  const isTouch = useTouchRenderer();
+
   // Eager — this is the first thing on screen — but still device-aware, so a
-  // phone pulls 2.9 MB instead of 11 MB before the page becomes usable
+  // narrow window pulls 2.9 MB instead of 11 MB before the page becomes usable
   const src = useAdaptiveVideoSource(containerRef, SOURCES, { eager: true });
 
   // Fade out Scroll to Manufacture indicator by 10% scroll depth
@@ -145,6 +154,17 @@ export default function CncScrollytelling() {
   // the scrubber's own readiness so the veil never lifts before the video can
   // actually be scrubbed.
   useEffect(() => {
+    // Still deciding which renderer to use — hold the veil for this tick only
+    if (isTouch === undefined) return;
+
+    // Image sequence: the opening still is a normal high-priority image, so
+    // there is nothing to buffer and no reason to hold a loading screen.
+    if (isTouch) {
+      setLoadPercentage(100);
+      const settle = setTimeout(() => setIsReady(true), 150);
+      return () => clearTimeout(settle);
+    }
+
     const video = videoRef.current;
     if (!video) return;
 
@@ -161,7 +181,7 @@ export default function CncScrollytelling() {
     }, 100);
 
     return () => clearInterval(progressInterval);
-  }, [isScrubReady]);
+  }, [isScrubReady, isTouch]);
 
   return (
     <div ref={containerRef} className="relative w-full h-[400vh] bg-[#050505]">
@@ -201,18 +221,27 @@ export default function CncScrollytelling() {
 
       {/* Main sticky video showcase container */}
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center pointer-events-none">
-        <video
-          ref={videoRef}
-          src={src}
-          poster="/posters/hero.webp"
-          preload="auto"
-          muted
-          playsInline
-          disablePictureInPicture
-          aria-hidden="true"
-          className="w-full h-full object-contain pointer-events-none block max-w-full max-h-full"
-          style={{ background: "#050505" }}
-        />
+        {isTouch ? (
+          <ScrollImageSequence
+            progress={scrollYProgress}
+            frames={FRAMES}
+            alt="5-axis CNC machining sequence — simulation through finished component"
+            eager
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={isTouch === false ? src : undefined}
+            poster="/posters/hero.webp"
+            preload="auto"
+            muted
+            playsInline
+            disablePictureInPicture
+            aria-hidden="true"
+            className="w-full h-full object-contain pointer-events-none block max-w-full max-h-full"
+            style={{ background: "#050505" }}
+          />
+        )}
 
         {/* Text Overlays - absolute scrollytelling beats */}
         <div className="absolute inset-0 flex items-center justify-center p-6 md:p-12 pointer-events-none">
