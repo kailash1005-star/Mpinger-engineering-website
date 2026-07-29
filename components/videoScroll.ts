@@ -147,9 +147,46 @@ export function useVideoScrubber(
       lastFrame = -1;
     };
 
-    const handleReady = () => setIsReady(true);
+    const markReady = () => setIsReady(true);
     const handleSeeked = () => {
       seeking = false;
+    };
+
+    /**
+     * iOS Safari will not buffer a video it has never played — it treats
+     * `preload="auto"` as roughly `metadata` to protect cellular data. Two
+     * consequences, both of which used to break the site outright on iPhone:
+     *
+     *   1. `canplaythrough` never fires and `readyState` plateaus at 1-2, so
+     *      any readiness gate waiting on those hangs forever.
+     *   2. Assigning `currentTime` is silently ignored until the element has
+     *      played at least once, so scrubbing does nothing.
+     *
+     * A muted inline play() is permitted without a user gesture; pausing on
+     * the next tick leaves the element unlocked for seeking and is invisible
+     * behind the loading veil.
+     */
+    const primeForSeeking = () => {
+      try {
+        const attempt = video.play();
+        if (attempt && typeof attempt.then === "function") {
+          attempt
+            .then(() => {
+              video.pause();
+              markReady();
+            })
+            .catch(() => {
+              // Autoplay refused (low-power mode, strict settings). The poster
+              // still shows, so reveal rather than trap the visitor.
+              markReady();
+            });
+        } else {
+          video.pause();
+          markReady();
+        }
+      } catch {
+        markReady();
+      }
     };
 
     const tick = (now: number) => {
@@ -183,21 +220,36 @@ export function useVideoScrubber(
       video.currentTime = (frame + 0.5) / fps;
     };
 
+    const handleLoadedData = () => {
+      // readyState 2 (HAVE_CURRENT_DATA): the first frame is decoded and the
+      // element is seekable. That is the real bar for scrubbing — waiting for
+      // canplaythrough buys nothing and never resolves on iOS.
+      primeForSeeking();
+    };
+
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    video.addEventListener("canplaythrough", handleReady);
+    video.addEventListener("loadeddata", handleLoadedData);
+    video.addEventListener("canplaythrough", markReady);
     video.addEventListener("seeked", handleSeeked);
 
     // The element may already be loaded (fast cache, remount) — the events
     // above would never fire again in that case
     if (video.readyState >= 1) handleLoadedMetadata();
-    if (video.readyState >= 4) setIsReady(true);
+    if (video.readyState >= 2) handleLoadedData();
+
+    // Last-resort backstop. Whatever the browser does or fails to do, the
+    // loading veil must never be able to trap a visitor: the poster frame is
+    // already painted, so revealing early degrades gracefully.
+    const watchdog = window.setTimeout(markReady, 8000);
 
     raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);
+      window.clearTimeout(watchdog);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      video.removeEventListener("canplaythrough", handleReady);
+      video.removeEventListener("loadeddata", handleLoadedData);
+      video.removeEventListener("canplaythrough", markReady);
       video.removeEventListener("seeked", handleSeeked);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
