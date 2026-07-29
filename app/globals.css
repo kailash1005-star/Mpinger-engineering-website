@@ -7,6 +7,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * Respect prefers-reduced-motion globally. The scroll-video scrubber handles
+ * this itself, but the framer-motion section reveals and CSS animations did
+ * not — leaving a vestibular-sensitive visitor with the full motion treatment.
+ * Motion is neutralised rather than removed so no content becomes unreachable.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 :root {
   --background: #050505;
   --foreground: #ffffff;

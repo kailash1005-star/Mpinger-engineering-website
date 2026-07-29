@@ -26,28 +26,41 @@ const QUICK_LINKS = [
   { label: "Global", sub: "German-Indian Bridge", href: "#global", image: "/backdrops/global-network.webp" },
 ];
 
+/**
+ * Hero beats follow the footage — simulation, strategy, cutting, inspection —
+ * but each one states a capability a buyer can actually evaluate. The audience
+ * here is a procurement or design engineer qualifying a supplier, so every beat
+ * carries one checkable claim and the benefit it buys them. Abstract praise
+ * ("mastery", "perfection") is deliberately avoided: the footage already
+ * carries the premium impression, and unverifiable superlatives read as noise
+ * to an industrial buyer.
+ */
 const BEATS: Beat[] = [
   {
-    title: "DIGITAL TWIN",
-    subtitle: "Engineering perfection begins in the virtual void. 0.001mm precision, simulated.",
+    title: "PROVEN BEFORE WE CUT",
+    subtitle:
+      "Every setup is simulated and collision-checked before a tool touches metal — so the first part and the thousandth come off identical.",
     start: 0.0,
     end: 0.2,
   },
   {
-    title: "KINEMATIC OPTIMIZATION",
-    subtitle: "Mapping toolpaths and continuous stress-testing before the first cut is ever made.",
+    title: "COMPLETE IN ONE SETUP",
+    subtitle:
+      "5-axis milling and mill-turn finish complex geometry in a single clamping — fewer setups, truer position, shorter lead times.",
     start: 0.25,
     end: 0.45,
   },
   {
-    title: "SUBTRACTIVE MASTERY",
-    subtitle: "Materializing code into physical reality. Forging aerospace-grade alloy block by block.",
+    title: "HELD TO 0.001 MM",
+    subtitle:
+      "Aerospace alloys, hardened steels and exotics — machined to tolerance across the full production run, not just the sample.",
     start: 0.5,
     end: 0.7,
   },
   {
-    title: "THE FINAL COMPONENT",
-    subtitle: "Uncompromising tolerance. Validated, inspected, and ready for deployment.",
+    title: "MEASURED, THEN RELEASED",
+    subtitle:
+      "100% verified on calibrated CMMs, with documentation your quality team can audit. ISO 9001:2015 certified.",
     start: 0.75,
     end: 0.95,
   },
@@ -55,11 +68,9 @@ const BEATS: Beat[] = [
 
 function BeatOverlay({
   beat,
-  index,
   scrollYProgress,
 }: {
   beat: Beat;
-  index: number;
   scrollYProgress: MotionValue<number>;
 }) {
   // Calculate 10% boundaries of range
@@ -85,9 +96,6 @@ function BeatOverlay({
       style={{ opacity, y }}
       className="absolute max-w-2xl text-center flex flex-col items-center space-y-4"
     >
-      <div className="mono-font text-[10px] tracking-[0.4em] text-[#7cbcf0] uppercase font-semibold">
-        {`Beat 0${index + 1} // Phase ${["virtual", "kinematic", "subtractive", "resolved"][index]}`}
-      </div>
       <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white/90 uppercase leading-none">
         {beat.title}
       </h3>
@@ -172,10 +180,10 @@ export default function CncScrollytelling() {
 
             <div className="flex flex-col items-center space-y-2 text-center">
               <span className="mono-font text-xs uppercase tracking-[0.3em] text-neutral-500">
-                System Initializing
+                Mpinger Engineering
               </span>
               <h2 className="text-sm font-semibold tracking-widest text-white/90 uppercase">
-                Mpinger CNC Simulation Twin
+                Precision CNC Manufacturing
               </h2>
             </div>
 
@@ -212,7 +220,6 @@ export default function CncScrollytelling() {
             <BeatOverlay
               key={index}
               beat={beat}
-              index={index}
               scrollYProgress={scrollYProgress}
             />
           ))}

@@ -41,7 +41,7 @@ export default function GlobalSection() {
 
       <div className="relative max-w-7xl mx-auto px-6 md:px-12">
         <SectionHeading
-          index="06"
+          index="05"
           eyebrow="German–Indian Manufacturing Bridge"
           title="The Best Of Two Worlds"
           description="German reliability combined with Indian precision manufacturing — one connected production network, coordinated from Hannover, machined in Coimbatore."

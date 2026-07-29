@@ -13,6 +13,36 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.mpinger.de"
 ).replace(/\/$/, "");
 
+/**
+ * Statutory company identity, taken from the published Impressum at
+ * mpinger.de/impressum. Single source for the legal pages and JSON-LD.
+ *
+ * NOTE — registerCourt / registerNumber are NOT on the current published
+ * Impressum. § 5 Abs. 1 Nr. 4 DDG requires the register and registration
+ * number for a GmbH, and a single missing field is enough to ground an
+ * Abmahnung. The placeholders below must be filled from the HRB extract
+ * before this site goes live.
+ */
+export const COMPANY = {
+  legalName: "mpinger GmbH",
+  tradingName: "Mpinger Engineering",
+  managingDirector: "Ramkumar Palanisamy",
+  vatId: "DE290407187",
+  registerCourt: "Amtsgericht Hannover",
+  registerNumber: "HRB — [TO BE CONFIRMED]",
+  address: {
+    street: "Gustav-Schenk-Weg 53",
+    postalCode: "30455",
+    city: "Hannover",
+    country: "DE",
+  },
+  phoneDE: "+49 (0) 511 10554580",
+  emailDE: "info@mpinger.de",
+  phoneIN: "+91 98945 09767",
+  emailIN: "sales@mpinger.in",
+  linkedIn: "https://www.linkedin.com/company/mpinger/",
+} as const;
+
 const GERMANY = {
   "@type": "Place",
   name: "mpinger GmbH — Headquarters",

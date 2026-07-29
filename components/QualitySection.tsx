@@ -134,7 +134,7 @@ export default function QualitySection() {
 
         {/* Section title — centered, clears as the tour begins */}
         <SectionTitleCard
-          index="05"
+          index="04"
           eyebrow="Metrology & Validation"
           title="Quality"
           scrollYProgress={scrollYProgress}
@@ -162,7 +162,7 @@ export default function QualitySection() {
         <div className="absolute right-8 md:right-12 top-1/2 -translate-y-1/2 hidden md:flex items-center space-x-4 pointer-events-none">
           <div className="flex flex-col items-end">
             <span className="mono-font text-[9px] uppercase tracking-[0.35em] text-[#7cbcf0]">
-              05
+              04
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/90">
               Metrology

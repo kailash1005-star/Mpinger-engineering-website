@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const PARTNERS = ["Procito", "Rabwin", "Frigate", "GDIZ"];
@@ -17,7 +18,7 @@ export default function ContactFooter() {
           className="flex flex-col items-center text-center space-y-6"
         >
           <span className="mono-font text-[11px] tracking-[0.4em] text-[#1d6fb5] uppercase font-bold">
-            07 // Start Your Project
+            06 // Start Your Project
           </span>
           <h2 className="text-3xl md:text-6xl font-extrabold tracking-tight text-slate-900 uppercase leading-none max-w-4xl">
             Your Partner For High-Precision Manufacturing
@@ -75,9 +76,13 @@ export default function ContactFooter() {
               30455 Hannover
             </p>
             <p className="mono-font text-[10px] text-[#a8d1f2] leading-relaxed">
-              +49 511 790 900 96
+              <a href="tel:+4951179090096" className="hover:text-white transition-colors">
+                +49 511 790 900 96
+              </a>
               <br />
-              info@mpinger.de
+              <a href="mailto:info@mpinger.de" className="hover:text-white transition-colors">
+                info@mpinger.de
+              </a>
             </p>
           </div>
 
@@ -94,9 +99,17 @@ export default function ContactFooter() {
               Tamil Nadu, India
             </p>
             <p className="mono-font text-[10px] text-[#a8d1f2] leading-relaxed">
-              +91 98945 09767
+              <a href="tel:+919894509767" className="hover:text-white transition-colors">
+                +91 98945 09767
+              </a>
               <br />
-              sales@mpinger.in · sk@mpinger.in
+              <a href="mailto:sales@mpinger.in" className="hover:text-white transition-colors">
+                sales@mpinger.in
+              </a>
+              {" · "}
+              <a href="mailto:sk@mpinger.in" className="hover:text-white transition-colors">
+                sk@mpinger.in
+              </a>
             </p>
           </div>
         </div>
@@ -104,9 +117,33 @@ export default function ContactFooter() {
         {/* Bottom bar */}
         <div className="border-t border-white/10">
           <div className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/40">
-              © {new Date().getFullYear()} Mpinger Engineering. All rights reserved.
-            </span>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-2">
+              <span className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/40">
+                © {new Date().getFullYear()} Mpinger Engineering.
+              </span>
+              {/* Statutory links — § 5 DDG requires the Impressum to be
+                  reachable from every page, hence their place in the footer. */}
+              <Link
+                href="/impressum"
+                className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/55 hover:text-white transition-colors"
+              >
+                Impressum
+              </Link>
+              <Link
+                href="/datenschutz"
+                className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/55 hover:text-white transition-colors"
+              >
+                Datenschutz
+              </Link>
+              <a
+                href="https://www.linkedin.com/company/mpinger/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/55 hover:text-white transition-colors"
+              >
+                LinkedIn ↗
+              </a>
+            </div>
             <div className="flex items-center gap-6">
               <span className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/40">
                 Partners:
