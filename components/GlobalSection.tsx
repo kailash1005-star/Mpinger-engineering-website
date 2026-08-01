@@ -25,7 +25,7 @@ const LOCATIONS = [
     role: "Manufacturing Plant",
     name: "Mpinger Engineering India Pvt. Ltd.",
     lines: ["SF. No. 89, Chinnavedampatti", "Coimbatore 641049, Tamil Nadu, India"],
-    contact: ["+91 98945 09767", "sales@mpinger.in"],
+    contact: ["+91 755 001 5799", "sales@mpinger-engineering.com"],
   },
 ];
 

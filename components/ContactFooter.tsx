@@ -35,10 +35,10 @@ export default function ContactFooter() {
               info@mpinger.de
             </a>
             <a
-              href="mailto:sales@mpinger.in"
+              href="mailto:sales@mpinger-engineering.com"
               className="mono-font text-[11px] uppercase tracking-[0.25em] font-semibold text-[#0b4e86] border border-[#1d6fb5]/40 bg-white hover:border-[#1d6fb5] hover:text-[#1d6fb5] transition-colors duration-300 rounded-md px-7 py-3.5"
             >
-              sales@mpinger.in
+              sales@mpinger-engineering.com
             </a>
           </div>
         </motion.div>
@@ -99,12 +99,12 @@ export default function ContactFooter() {
               Tamil Nadu, India
             </p>
             <p className="mono-font text-[10px] text-[#a8d1f2] leading-relaxed">
-              <a href="tel:+919894509767" className="hover:text-white transition-colors">
-                +91 98945 09767
+              <a href="tel:+917550015799" className="hover:text-white transition-colors">
+                +91 755 001 5799
               </a>
               <br />
-              <a href="mailto:sales@mpinger.in" className="hover:text-white transition-colors">
-                sales@mpinger.in
+              <a href="mailto:sales@mpinger-engineering.com" className="hover:text-white transition-colors">
+                sales@mpinger-engineering.com
               </a>
               {" · "}
               <a href="mailto:sk@mpinger.in" className="hover:text-white transition-colors">

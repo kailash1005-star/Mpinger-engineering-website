@@ -38,8 +38,8 @@ export const COMPANY = {
   },
   phoneDE: "+49 (0) 511 10554580",
   emailDE: "info@mpinger.de",
-  phoneIN: "+91 98945 09767",
-  emailIN: "sales@mpinger.in",
+  phoneIN: "+91 755 001 5799",
+  emailIN: "sales@mpinger-engineering.com",
   linkedIn: "https://www.linkedin.com/company/mpinger/",
 } as const;
 
@@ -67,7 +67,7 @@ const INDIA = {
     postalCode: "641049",
     addressCountry: "IN",
   },
-  telephone: "+91 98945 09767",
+  telephone: "+91 755 001 5799",
 };
 
 export const ORGANIZATION_JSON_LD = {
@@ -95,8 +95,8 @@ export const ORGANIZATION_JSON_LD = {
     {
       "@type": "ContactPoint",
       contactType: "sales",
-      email: "sales@mpinger.in",
-      telephone: "+91 98945 09767",
+      email: "sales@mpinger-engineering.com",
+      telephone: "+91 755 001 5799",
       areaServed: "IN",
       availableLanguage: ["en", "ta"],
     },

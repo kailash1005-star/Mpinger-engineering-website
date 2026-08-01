@@ -9,7 +9,9 @@ export interface Machine {
   make: string;
   category: string;
   units?: string;
-  image: string;
+  /** Omit where no usable product photo exists — the slide then centres on
+   *  its specifications instead of showing a weak or mismatched image. */
+  image?: string;
   specs: MachineSpec[];
 }
 
@@ -160,7 +162,6 @@ export const MACHINES: Machine[] = [
     make: "JYOTI",
     category: "CNC Turning Machine",
     units: "4 machines",
-    image: "/machines/jyoti-tmc-250.webp",
     specs: [
       { label: "Max. Turning Length", value: "700 mm" },
       { label: "Max. Turning Diameter", value: "250 mm" },
@@ -174,7 +175,6 @@ export const MACHINES: Machine[] = [
     make: "STM — S&T Machinery",
     category: "Vertical Machining Center",
     units: "2 machines",
-    image: "/machines/stm-vl-1050.webp",
     specs: [
       { label: "Table Size", value: "1200 × 600 mm" },
       { label: "Spindle Speed", value: "8,000 rpm (opt. 10,000)" },
