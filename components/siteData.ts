@@ -9,9 +9,7 @@ export interface Machine {
   make: string;
   category: string;
   units?: string;
-  /** Omit where no usable product photo exists — the slide then centres on
-   *  its specifications instead of showing a weak or mismatched image. */
-  image?: string;
+  image: string;
   specs: MachineSpec[];
 }
 
@@ -154,33 +152,6 @@ export const MACHINES: Machine[] = [
       { label: "Table Size", value: "950 × 660 mm" },
       { label: "Spindle Speed", value: "10,000 rpm" },
       { label: "Spindle Power", value: "2 × 18 kW" },
-    ],
-  },
-  {
-    id: "jyoti-tmc-250",
-    model: "TMC 250",
-    make: "JYOTI",
-    category: "CNC Turning Machine",
-    units: "4 machines",
-    specs: [
-      { label: "Max. Turning Length", value: "700 mm" },
-      { label: "Max. Turning Diameter", value: "250 mm" },
-      { label: "Chuck Size", value: "250 mm" },
-      { label: "Chuck Diameter", value: "250 mm" },
-    ],
-  },
-  {
-    id: "stm-vl-1050",
-    model: "VL 1050",
-    make: "STM — S&T Machinery",
-    category: "Vertical Machining Center",
-    units: "2 machines",
-    specs: [
-      { label: "Table Size", value: "1200 × 600 mm" },
-      { label: "Spindle Speed", value: "8,000 rpm (opt. 10,000)" },
-      { label: "Transmission", value: "Belt Type" },
-      { label: "Power Supply", value: "20 kVA" },
-      { label: "Taper", value: "BT 40" },
     ],
   },
   {

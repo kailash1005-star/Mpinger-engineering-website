@@ -18,13 +18,8 @@ function MachineSlide({ machine, index }: { machine: Machine; index: number }) {
         {String(index + 1).padStart(2, "0")}
       </span>
 
-      <div
-        className={`grid grid-cols-1 gap-6 lg:gap-12 w-full max-w-6xl items-center ${
-          machine.image ? "lg:grid-cols-12" : ""
-        }`}
-      >
-        {/* Machine visual — omitted where no usable photo exists */}
-        {machine.image && (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 w-full max-w-6xl items-center">
+        {/* Machine visual */}
         <div className="lg:col-span-7 relative">
           <div className="relative border border-slate-200 bg-white rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(11,78,134,0.12)]">
             <span className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-[#3f97dd] rounded-tl-xl z-10" />
@@ -43,14 +38,9 @@ function MachineSlide({ machine, index }: { machine: Machine; index: number }) {
             </div>
           </div>
         </div>
-        )}
 
-        {/* Spec panel — centres itself when the slide carries no photo */}
-        <div
-          className={`flex flex-col space-y-5 ${
-            machine.image ? "lg:col-span-5" : "max-w-2xl mx-auto w-full"
-          }`}
-        >
+        {/* Spec panel */}
+        <div className="lg:col-span-5 flex flex-col space-y-5">
           <div className="flex items-center space-x-3">
             <span className="mono-font text-[9px] uppercase tracking-[0.3em] text-white font-bold bg-gradient-to-r from-[#0b4e86] to-[#3f97dd] px-3 py-1.5 rounded-md">
               {machine.category}
