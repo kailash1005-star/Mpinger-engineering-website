@@ -10,7 +10,7 @@
  * output rather than to "localhost" leaking into published tags.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.mpinger.de"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://mpinger-engineering.com"
 ).replace(/\/$/, "");
 
 /**

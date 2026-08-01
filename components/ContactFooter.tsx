@@ -106,10 +106,6 @@ export default function ContactFooter() {
               <a href="mailto:sales@mpinger-engineering.com" className="hover:text-white transition-colors">
                 sales@mpinger-engineering.com
               </a>
-              {" · "}
-              <a href="mailto:sk@mpinger.in" className="hover:text-white transition-colors">
-                sk@mpinger.in
-              </a>
             </p>
           </div>
         </div>
