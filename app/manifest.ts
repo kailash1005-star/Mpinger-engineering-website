@@ -15,12 +15,11 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#050505",
     theme_color: "#050505",
+    // Square marks, not the wide wordmark — a 264x95 logo is letterboxed into
+    // an unreadable sliver on a home screen.
     icons: [
-      {
-        src: "/logo.png",
-        sizes: "any",
-        type: "image/png",
-      },
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
   };
 }

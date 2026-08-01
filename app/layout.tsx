@@ -95,9 +95,9 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  icons: {
-    icon: "/favicon.ico",
-  },
+  // Icons are intentionally not declared here. Next derives them from
+  // app/favicon.ico, app/icon.png and app/apple-icon.png, and an explicit
+  // `icons` entry would override that convention and drop the PNG variants.
 };
 
 export const viewport: Viewport = {
