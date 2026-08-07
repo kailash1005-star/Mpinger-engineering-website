@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 
 const PARTNERS = ["Procito", "Rabwin", "Frigate", "GDIZ"];
 
-export default function ContactFooter() {
+export default function ContactFooter({ showCta = true }: { showCta?: boolean }) {
   return (
     <footer id="contact" className="relative bg-[#f3f6fa]">
       {/* CTA band */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
+      {showCta && <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -42,7 +42,7 @@ export default function ContactFooter() {
             </a>
           </div>
         </motion.div>
-      </div>
+      </div>}
 
       {/* Footer grid — deep navy anchor */}
       <div className="bg-[#06263f]">

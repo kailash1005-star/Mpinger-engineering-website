@@ -80,3 +80,54 @@ body {
     text-wrap: balance;
   }
 }
+
+@layer components {
+  .engineering-field {
+    display: block;
+  }
+
+  .engineering-field > span {
+    display: block;
+    margin-bottom: 0.6rem;
+    color: #0b4e86;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .engineering-field > span b {
+    color: #1d6fb5;
+  }
+
+  .engineering-field input,
+  .engineering-field select,
+  .engineering-field textarea {
+    width: 100%;
+    border: 1px solid #d9e2eb;
+    border-radius: 0.375rem;
+    background: #fff;
+    padding: 0.85rem 0.9rem;
+    color: #1e293b;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  .engineering-field input:focus,
+  .engineering-field select:focus,
+  .engineering-field textarea:focus {
+    border-color: #1d6fb5;
+    box-shadow: 0 0 0 3px rgba(29, 111, 181, 0.12);
+  }
+
+  .engineering-field textarea {
+    min-height: 9rem;
+    resize: vertical;
+  }
+
+  .engineering-field textarea::placeholder {
+    color: #94a3b8;
+  }
+}

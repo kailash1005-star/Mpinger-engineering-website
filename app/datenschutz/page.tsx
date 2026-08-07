@@ -12,10 +12,8 @@ export const metadata: Metadata = {
 
 /**
  * This policy describes what THIS site actually does, which is deliberately
- * little: no cookies are set, no analytics run, no forms are submitted, and all
- * fonts and media are served from our own origin. If any of that changes —
- * adding a contact form, analytics, an embedded map or video — this document
- * and a consent banner both become mandatory before the change ships.
+ * little: no cookies are set and no analytics run. The contact form sends
+ * submitted enquiry data to Web3Forms for email delivery.
  */
 export default function Datenschutz() {
   return (
@@ -90,29 +88,32 @@ export default function Datenschutz() {
       <section>
         <h2>4. Externe Dienste und Schriftarten / Third-party services</h2>
         <p>
-          Sämtliche Inhalte dieser Website — einschließlich Schriftarten, Bilder
-          und Videos — werden ausschließlich von unserem eigenen Server
-          ausgeliefert. Es werden keine Inhalte von Drittanbietern (etwa Google
-          Fonts, CDNs, eingebettete Karten oder Videoplattformen) nachgeladen.
-          Beim Besuch dieser Website wird daher keine Verbindung zu Servern
-          Dritter hergestellt.
+           Sämtliche Inhalte dieser Website — einschließlich Schriftarten, Bilder
+           und Videos — werden ausschließlich von unserem eigenen Server
+           ausgeliefert. Es werden keine Inhalte von Drittanbietern (etwa Google
+           Fonts, CDNs, eingebettete Karten oder Videoplattformen) nachgeladen.
+           Eine Ausnahme ist die Übermittlung des Kontaktformulars an Web3Forms,
+           sobald Sie eine Anfrage absenden.
         </p>
       </section>
 
       <section>
         <h2>5. Kontaktaufnahme / Contacting us</h2>
         <p>
-          Diese Website enthält kein Kontaktformular. Wenn Sie uns per E-Mail
-          oder Telefon kontaktieren, werden Ihre Angaben zur Bearbeitung Ihrer
-          Anfrage und für den Fall von Anschlussfragen bei uns gespeichert.
+           Über das Kontaktformular können Sie uns Zeichnungen, Spezifikationen
+           und sonstige Projektdaten senden. Die Angaben werden zur Bearbeitung
+           Ihrer Anfrage und für den Fall von Anschlussfragen verarbeitet und
+           über Web3Forms an uns übermittelt.
           Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei
           vertragsbezogenen Anfragen, ansonsten Art. 6 Abs. 1 lit. f DSGVO.
         </p>
         <p>
-          Wir geben diese Daten nicht ohne Ihre Einwilligung weiter. Die Löschung
-          erfolgt, sobald Ihre Anfrage abschließend bearbeitet ist und keine
-          gesetzlichen Aufbewahrungspflichten (insbesondere handels- und
-          steuerrechtliche Fristen von 6 bis 10 Jahren) entgegenstehen.
+           Web3Forms verarbeitet die Übermittlung als technischer Dienstleister.
+           Der Dienst speichert Formulareinsendungen nach eigenen Angaben auf
+           dem kostenlosen Tarif für bis zu 30 Tage. Die Löschung bei uns erfolgt,
+           sobald Ihre Anfrage abschließend bearbeitet ist und keine gesetzlichen
+           Aufbewahrungspflichten (insbesondere handels- und steuerrechtliche
+           Fristen von 6 bis 10 Jahren) entgegenstehen.
         </p>
       </section>
 

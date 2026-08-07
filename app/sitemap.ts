@@ -15,6 +15,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 1,
     },
+    {
+      url: `${SITE_URL}/contact`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // Statutory pages: listed so crawlers can reach them, but low priority —
     // they carry no search value and are noindex'd at the page level.
     {
