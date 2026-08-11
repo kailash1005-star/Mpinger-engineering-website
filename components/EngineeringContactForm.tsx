@@ -2,9 +2,14 @@
 
 import { FormEvent, useState } from "react";
 
-// Web3Forms access keys are public client-side identifiers. Replace this value
-// with the production key before launch.
-export const WEB3FORMS_ACCESS_KEY = "ead061de-346f-4cd4-a55a-aa878ae22cfd";
+// Web3Forms access keys are public client-side identifiers, so this is safe to
+// ship in the bundle.
+//
+// The `: string` annotation is load-bearing, not decoration. Without it the
+// const narrows to its own literal type, the placeholder guard below compares
+// two literals that can never be equal, and TypeScript rejects the build with
+// TS2367 — which is exactly how setting this key broke the last deployment.
+export const WEB3FORMS_ACCESS_KEY: string = "ead061de-346f-4cd4-a55a-aa878ae22cfd";
 
 type FormState = "idle" | "sending" | "success" | "error";
 
