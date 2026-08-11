@@ -16,7 +16,7 @@ const TOTAL_TARGET_FRAMES = 300;
 const TOTAL_SRC_FRAMES = 300;
 
 for (let i = 0; i < TOTAL_TARGET_FRAMES; i++) {
-  // Map index [0, 299] to source index [1, 300]
+  /// Map index [0, 299] to source index [1, 300]
   const srcIndex = i + 1;
   const srcFileName = `ezgif-frame-${String(srcIndex).padStart(3, '0')}.jpg`;
   const destFileName = `frame_${i}.webp`;
