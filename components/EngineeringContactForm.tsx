@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 
 // Web3Forms access keys are public client-side identifiers. Replace this value
 // with the production key before launch.
-export const WEB3FORMS_ACCESS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
+export const WEB3FORMS_ACCESS_KEY = "ead061de-346f-4cd4-a55a-aa878ae22cfd";
 
 type FormState = "idle" | "sending" | "success" | "error";
 
