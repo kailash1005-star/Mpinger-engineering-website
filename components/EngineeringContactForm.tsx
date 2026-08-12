@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { trackEvent, trackTag, upgradeSession } from "@/lib/clarity";
 
 // Web3Forms access keys are public client-side identifiers, so this is safe to
 // ship in the bundle.
@@ -44,9 +45,20 @@ export default function EngineeringContactForm() {
         throw new Error(result.message || "The message could not be sent.");
       }
 
+      // Analytics: the enquiry is this site's only conversion, so it is worth
+      // being able to replay the visit that produced one. `upgrade` pins the
+      // recording so sampling cannot discard the handful of sessions that
+      // actually matter. Only the project-type dropdown is tagged — it is an
+      // enum, not personal data.
+      const projectType = String(formData.get("project_type") || "unspecified");
+      trackTag("project_type", projectType);
+      trackEvent("enquiry_submitted");
+      upgradeSession("enquiry submitted");
+
       form.reset();
       setState("success");
     } catch (error) {
+      trackEvent("enquiry_failed");
       setState("error");
       setErrorMessage(
         error instanceof Error ? error.message : "The message could not be sent. Please email us directly."
@@ -58,21 +70,25 @@ export default function EngineeringContactForm() {
     <form onSubmit={handleSubmit} className="space-y-7">
       <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} aria-hidden="true" />
 
+      {/* data-clarity-mask keeps these values out of session replay even if the
+          project's masking level is later relaxed in the Clarity dashboard.
+          Enquiries carry names, work emails and part specifications, and a
+          recording is not the place for a customer's confidential geometry. */}
       <div className="grid gap-6 md:grid-cols-2">
         <label className="engineering-field">
           <span>Name <b>*</b></span>
-          <input type="text" name="name" autoComplete="name" required />
+          <input type="text" name="name" autoComplete="name" required data-clarity-mask="true" />
         </label>
         <label className="engineering-field">
           <span>Work email <b>*</b></span>
-          <input type="email" name="email" autoComplete="email" required />
+          <input type="email" name="email" autoComplete="email" required data-clarity-mask="true" />
         </label>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <label className="engineering-field">
           <span>Company</span>
-          <input type="text" name="company" autoComplete="organization" />
+          <input type="text" name="company" autoComplete="organization" data-clarity-mask="true" />
         </label>
         <label className="engineering-field">
           <span>Project type</span>
@@ -89,7 +105,7 @@ export default function EngineeringContactForm() {
 
       <label className="engineering-field">
         <span>Tell us about the part <b>*</b></span>
-        <textarea name="message" required rows={6} placeholder="Material, quantity, tolerances, target date — whatever is useful at this stage." />
+        <textarea name="message" required rows={6} data-clarity-mask="true" placeholder="Material, quantity, tolerances, target date — whatever is useful at this stage." />
       </label>
 
       <input type="hidden" name="subject" value="New enquiry from Mpinger Engineering" />

@@ -3,8 +3,9 @@
 const isDev = process.env.NODE_ENV === "development";
 
 /**
- * Security headers. The site loads no third-party scripts, fonts, frames or
- * XHR endpoints, so the CSP can be genuinely strict rather than permissive.
+ * Security headers. The site loads no third-party fonts or frames, and its
+ * only cross-origin traffic is the contact form POST plus consented analytics,
+ * so the CSP can stay close to strict rather than permissive.
  *
  * 'unsafe-inline' on script-src is required because Next.js inlines its
  * hydration bootstrap; a nonce-based policy needs middleware and per-request
@@ -18,14 +19,46 @@ const isDev = process.env.NODE_ENV === "development";
  *     https:// where nothing is listening
  * None of these ever reach production.
  */
+// The contact form posts here via fetch(). It must be listed in connect-src or
+// the browser blocks the request before it leaves the page — connect-src has no
+// implicit allowance for "the endpoint this app obviously needs".
+const FORM_ENDPOINT_ORIGIN = "https://api.web3forms.com";
+
+// Microsoft Clarity spreads itself across three directives, and the snippet
+// Microsoft hands out only reveals the first of them:
+//   script-src — the snippet loads www.clarity.ms/tag/<id>, but that file is a
+//     bootstrapper which then pulls the real library from scripts.clarity.ms.
+//     Allowing only the host in the snippet loads half of Clarity and no more.
+//   img-src    — c.clarity.ms/c.gif is a pixel beacon, not an XHR, so
+//     connect-src does not cover it.
+//   connect-src — regional collectors (u./c./e./…clarity.ms) receive the
+//     payload. Hence the wildcard: the subdomain varies by version and region.
+//
+// c.bing.com is deliberately absent. Clarity attempts an advertising identity
+// sync there (a c.gif carrying CtsSyncId/MUID), which is cross-site ad
+// tracking rather than site analytics. We tell Clarity `ad_Storage: denied`
+// and tell visitors the same in the Datenschutzerklärung, so the CSP enforces
+// what we promised instead of relying on the vendor to honour it. Blocking it
+// costs nothing measurable: session capture, heatmaps and events all run over
+// clarity.ms. The trade is one console warning per page load, in exchange for
+// the privacy claim being true. Add "https://c.bing.com" to both img-src and
+// connect-src to allow it.
+//
+// These entries only make the requests *possible*; whether they happen at all
+// is decided by the consent banner, which does not render the tag until the
+// visitor opts in.
+const CLARITY_SCRIPT_ORIGINS = "https://*.clarity.ms";
+const CLARITY_IMG_ORIGINS = "https://*.clarity.ms";
+const CLARITY_CONNECT_ORIGINS = "https://*.clarity.ms";
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' ${CLARITY_SCRIPT_ORIGINS}${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  `img-src 'self' data: blob: ${CLARITY_IMG_ORIGINS}`,
   "media-src 'self' blob:",
   "font-src 'self'",
-  `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self' ${FORM_ENDPOINT_ORIGIN} ${CLARITY_CONNECT_ORIGINS}${isDev ? " ws: wss:" : ""}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

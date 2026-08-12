@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ConsentSettingsButton from "@/components/ConsentSettingsButton";
 import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/seo";
 
@@ -11,16 +12,21 @@ export const metadata: Metadata = {
 };
 
 /**
- * This policy describes what THIS site actually does, which is deliberately
- * little: no cookies are set and no analytics run. The contact form sends
- * submitted enquiry data to Web3Forms for email delivery.
+ * This policy describes what THIS site actually does. Two things leave the
+ * visitor's browser: the contact form goes to Web3Forms for email delivery,
+ * and — only after an explicit opt-in — Microsoft Clarity receives usage
+ * analytics.
+ *
+ * Keep this file in step with the code. If components/CookieConsent.tsx or
+ * lib/clarity.ts changes what is collected, section 3 below stops being true,
+ * and an inaccurate Datenschutzerklärung is itself the finding.
  */
 export default function Datenschutz() {
   return (
     <LegalPage
       title="Datenschutz"
       subtitle="Datenschutzerklärung gemäß Art. 13 DSGVO — Privacy notice under the GDPR."
-      updated="Juli 2026"
+      updated="August 2026"
     >
       <section>
         <h2>1. Verantwortlicher / Data controller</h2>
@@ -68,20 +74,82 @@ export default function Datenschutz() {
       </section>
 
       <section>
-        <h2>3. Cookies und Tracking / Cookies and tracking</h2>
+        <h2>3. Webanalyse mit Microsoft Clarity / Analytics</h2>
         <p>
           <strong>
-            Diese Website setzt keine Cookies und verwendet keine Analyse-,
-            Tracking- oder Werbe-Technologien.
+            Ohne Ihre ausdrückliche Einwilligung setzt diese Website keine
+            Cookies zu Analysezwecken und überträgt keine Nutzungsdaten an
+            Dritte.
           </strong>{" "}
-          Es findet keine Profilbildung und keine automatisierte
-          Entscheidungsfindung statt. Ein Cookie-Consent-Banner ist daher nicht
-          erforderlich.
+          Beim ersten Besuch werden Sie über ein Banner gefragt. Erst wenn Sie
+          dort zustimmen, wird Microsoft Clarity geladen. Lehnen Sie ab oder
+          treffen Sie keine Auswahl, unterbleibt jede Analyse; die Website ist
+          uneingeschränkt nutzbar.
         </p>
         <p>
-          This website sets no cookies and uses no analytics, tracking or
-          advertising technologies. No profiling or automated decision-making
-          takes place.
+          Microsoft Clarity ist ein Webanalysedienst der Microsoft Ireland
+          Operations Limited, One Microsoft Place, South County Business Park,
+          Leopardstown, Dublin 18, Irland. Mit Ihrer Einwilligung erfasst
+          Clarity, wie diese Website genutzt wird — insbesondere Seitenaufrufe,
+          Klick- und Scrollverhalten, Mausbewegungen, Bildschirmgröße,
+          Browser- und Gerätetyp, ungefährer Standort auf Basis der IP-Adresse
+          sowie eine pseudonymisierte Aufzeichnung des Sitzungsverlaufs
+          (Session Replay). Daraus werden Heatmaps und aggregierte Auswertungen
+          erstellt.
+        </p>
+        <p>
+          <strong>Eingaben in das Kontaktformular</strong> — Name, E-Mail-Adresse,
+          Firma und Ihre Projektbeschreibung — werden bereits im Browser
+          maskiert und sind in den Aufzeichnungen nicht lesbar. Erfasst wird
+          lediglich, <em>dass</em> eine Anfrage abgesendet wurde und welche
+          Projektart ausgewählt war.
+        </p>
+        <p>
+          Zu diesem Zweck werden Cookies auf Ihrem Endgerät gespeichert und
+          ausgelesen, unter anderem <code>_clck</code> und <code>_clsk</code>.
+          Werbebezogene Speicherung ist deaktiviert: Wir übermitteln an Clarity
+          ausdrücklich <code>ad_Storage: denied</code>, sodass keine Daten für
+          Werbezwecke verarbeitet werden. Es findet keine Profilbildung zu
+          Werbezwecken und keine automatisierte Entscheidungsfindung statt.
+        </p>
+        <p>
+          <strong>Rechtsgrundlage</strong> für das Speichern und Auslesen von
+          Informationen auf Ihrem Endgerät ist § 25 Abs. 1 TDDDG, für die
+          anschließende Verarbeitung Art. 6 Abs. 1 lit. a DSGVO — jeweils Ihre
+          Einwilligung.
+        </p>
+        <p>
+          <strong>Drittlandübermittlung:</strong> Eine Übermittlung an die
+          Microsoft Corporation in die USA kann nicht ausgeschlossen werden.
+          Microsoft ist unter dem EU-US Data Privacy Framework zertifiziert; für
+          die Verarbeitung gelten ergänzend die Standardvertragsklauseln der
+          EU-Kommission.
+        </p>
+        <p>
+          <strong>Widerruf:</strong> Sie können Ihre Einwilligung jederzeit mit
+          Wirkung für die Zukunft widerrufen. Die Rechtmäßigkeit der bis zum
+          Widerruf erfolgten Verarbeitung bleibt unberührt.
+        </p>
+        <ConsentSettingsButton />
+        <p>
+          Ihre Entscheidung wird ausschließlich lokal in Ihrem Browser
+          (localStorage) gespeichert, damit wir Sie nicht bei jedem Seitenaufruf
+          erneut fragen müssen. Weitere Informationen finden Sie in der{" "}
+          <a
+            href="https://privacy.microsoft.com/de-de/privacystatement"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Datenschutzerklärung von Microsoft
+          </a>
+          .
+        </p>
+        <p>
+          This website loads Microsoft Clarity only after you opt in via the
+          consent banner. It records pseudonymised session replays and heatmaps;
+          contact-form inputs are masked in the browser and never reach
+          Microsoft. Advertising storage is explicitly denied. You can withdraw
+          your consent at any time using the button above.
         </p>
       </section>
 
@@ -92,8 +160,10 @@ export default function Datenschutz() {
            und Videos — werden ausschließlich von unserem eigenen Server
            ausgeliefert. Es werden keine Inhalte von Drittanbietern (etwa Google
            Fonts, CDNs, eingebettete Karten oder Videoplattformen) nachgeladen.
-           Eine Ausnahme ist die Übermittlung des Kontaktformulars an Web3Forms,
-           sobald Sie eine Anfrage absenden.
+           Verbindungen zu Dritten entstehen nur in zwei Fällen: bei der
+           Übermittlung des Kontaktformulars an Web3Forms, sobald Sie eine
+           Anfrage absenden, und beim Laden von Microsoft Clarity, sofern Sie
+           zuvor eingewilligt haben (siehe Ziffer 3).
         </p>
       </section>
 
