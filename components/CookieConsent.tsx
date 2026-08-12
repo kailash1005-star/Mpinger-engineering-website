@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import ClarityScript from "./ClarityScript";
+import GoogleAnalytics from "./GoogleAnalytics";
 import { CLARITY_ENABLED, clearClarityCookies, denyClarityConsent } from "@/lib/clarity";
+import { GA_ENABLED, clearGaCookies, denyGaConsent } from "@/lib/gtag";
 import {
   ConsentStatus,
   onConsentChange,
@@ -53,7 +55,9 @@ export default function CookieConsent() {
 
       if (next === "denied") {
         denyClarityConsent();
+        denyGaConsent();
         clearClarityCookies();
+        clearGaCookies();
         // Unmounting the <Script> does not unload a tag the browser has already
         // executed, so an actual withdrawal needs a fresh document to be
         // truthful rather than merely well-intentioned.
@@ -65,7 +69,12 @@ export default function CookieConsent() {
 
   return (
     <>
-      {CLARITY_ENABLED && status === "granted" && <ClarityScript />}
+      {status === "granted" && (
+        <>
+          {CLARITY_ENABLED && <ClarityScript />}
+          {GA_ENABLED && <GoogleAnalytics />}
+        </>
+      )}
 
       {visible && (
         <div
@@ -90,15 +99,17 @@ export default function CookieConsent() {
                   Cookies &amp; Analyse
                 </h2>
                 <p className="text-sm leading-relaxed text-slate-700">
-                  Wir möchten mit Microsoft Clarity messen, wie diese Website genutzt wird, um sie
-                  zu verbessern. Dabei werden Cookies gesetzt und Ihre Sitzung pseudonymisiert
-                  aufgezeichnet. Das geschieht nur mit Ihrer Einwilligung — die Website
-                  funktioniert ohne Einschränkung, wenn Sie ablehnen.
+                  Wir möchten mit Microsoft Clarity und Google Analytics messen, wie diese Website
+                  genutzt wird, um sie zu verbessern. Dabei werden Cookies gesetzt und Ihre
+                  Sitzung pseudonymisiert aufgezeichnet. Werbe-Tracking findet nicht statt. Das
+                  geschieht nur mit Ihrer Einwilligung — die Website funktioniert ohne
+                  Einschränkung, wenn Sie ablehnen.
                 </p>
                 <p className="text-xs leading-relaxed text-slate-500">
-                  We would like to measure how this site is used, via Microsoft Clarity. This sets
-                  cookies and records a pseudonymised session replay. Only with your consent — you
-                  can withdraw it at any time. Details in our{" "}
+                  We would like to measure how this site is used, via Microsoft Clarity and Google
+                  Analytics. This sets cookies and records a pseudonymised session replay. No
+                  advertising tracking. Only with your consent — you can withdraw it at any time.
+                  Details in our{" "}
                   <Link href="/datenschutz" className="text-[#1d6fb5] underline">
                     Datenschutzerklärung
                   </Link>

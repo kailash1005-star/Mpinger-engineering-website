@@ -8,9 +8,14 @@
  * Set NEXT_PUBLIC_SITE_URL in the host's environment at deploy time. The
  * fallback is the production domain, so a missing variable degrades to correct
  * output rather than to "localhost" leaking into published tags.
+ *
+ * The www host is deliberate: the apex 301-redirects to www, so www is where
+ * pages are actually served. Naming the apex here pointed every canonical,
+ * og:url and sitemap entry at a redirect instead of at the final URL, which is
+ * the one thing a canonical exists to state.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://mpinger-engineering.com"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.mpinger-engineering.com"
 ).replace(/\/$/, "");
 
 /**

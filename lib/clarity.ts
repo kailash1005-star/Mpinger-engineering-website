@@ -7,6 +7,8 @@
  * ad-blocker all degrade to silence rather than a TypeError in a click handler.
  */
 
+import { deleteCookiesByPrefix } from "./cookies";
+
 export const CLARITY_PROJECT_ID = "y0thowtok5";
 
 /**
@@ -64,15 +66,8 @@ export function denyClarityConsent(): void {
  * as removing what it already wrote, and a withdrawal that leaves the
  * identifier sitting on the visitor's device is a withdrawal in name only.
  */
-const CLARITY_COOKIES = ["_clck", "_clsk"];
-
 export function clearClarityCookies(): void {
-  if (typeof document === "undefined") return;
-  for (const name of CLARITY_COOKIES) {
-    // Path must match the one Clarity wrote with, or the browser keeps the
-    // original cookie and silently adds a second, already-expired one.
-    document.cookie = `${name}=; Max-Age=0; path=/`;
-  }
+  deleteCookiesByPrefix(["_clck", "_clsk"]);
 }
 
 /**

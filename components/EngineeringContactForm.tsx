@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { trackEvent, trackTag, upgradeSession } from "@/lib/clarity";
+import { trackLead, trackLeadFailed } from "@/lib/gtag";
 
 // Web3Forms access keys are public client-side identifiers, so this is safe to
 // ship in the bundle.
@@ -54,11 +55,13 @@ export default function EngineeringContactForm() {
       trackTag("project_type", projectType);
       trackEvent("enquiry_submitted");
       upgradeSession("enquiry submitted");
+      trackLead(projectType);
 
       form.reset();
       setState("success");
     } catch (error) {
       trackEvent("enquiry_failed");
+      trackLeadFailed();
       setState("error");
       setErrorMessage(
         error instanceof Error ? error.message : "The message could not be sent. Please email us directly."

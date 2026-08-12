@@ -14,12 +14,13 @@ export const metadata: Metadata = {
 /**
  * This policy describes what THIS site actually does. Two things leave the
  * visitor's browser: the contact form goes to Web3Forms for email delivery,
- * and — only after an explicit opt-in — Microsoft Clarity receives usage
- * analytics.
+ * and — only after an explicit opt-in — Microsoft Clarity and Google Analytics
+ * receive usage analytics.
  *
- * Keep this file in step with the code. If components/CookieConsent.tsx or
- * lib/clarity.ts changes what is collected, section 3 below stops being true,
- * and an inaccurate Datenschutzerklärung is itself the finding.
+ * Keep this file in step with the code. If components/CookieConsent.tsx,
+ * lib/clarity.ts or lib/gtag.ts changes what is collected, section 3 below
+ * stops being true, and an inaccurate Datenschutzerklärung is itself the
+ * finding.
  */
 export default function Datenschutz() {
   return (
@@ -74,7 +75,7 @@ export default function Datenschutz() {
       </section>
 
       <section>
-        <h2>3. Webanalyse mit Microsoft Clarity / Analytics</h2>
+        <h2>3. Webanalyse / Analytics</h2>
         <p>
           <strong>
             Ohne Ihre ausdrückliche Einwilligung setzt diese Website keine
@@ -82,10 +83,13 @@ export default function Datenschutz() {
             Dritte.
           </strong>{" "}
           Beim ersten Besuch werden Sie über ein Banner gefragt. Erst wenn Sie
-          dort zustimmen, wird Microsoft Clarity geladen. Lehnen Sie ab oder
-          treffen Sie keine Auswahl, unterbleibt jede Analyse; die Website ist
-          uneingeschränkt nutzbar.
+          dort zustimmen, werden Microsoft Clarity und Google Analytics geladen.
+          Lehnen Sie ab oder treffen Sie keine Auswahl, unterbleibt jede
+          Analyse; die Website ist uneingeschränkt nutzbar. Beide Dienste werden
+          gemeinsam über dieselbe Einwilligung gesteuert.
         </p>
+
+        <h3 className="mt-6">3.1 Microsoft Clarity</h3>
         <p>
           Microsoft Clarity ist ein Webanalysedienst der Microsoft Ireland
           Operations Limited, One Microsoft Place, South County Business Park,
@@ -112,6 +116,31 @@ export default function Datenschutz() {
           Werbezwecke verarbeitet werden. Es findet keine Profilbildung zu
           Werbezwecken und keine automatisierte Entscheidungsfindung statt.
         </p>
+        <h3 className="mt-6">3.2 Google Analytics 4</h3>
+        <p>
+          Google Analytics 4 ist ein Webanalysedienst der Google Ireland
+          Limited, Gordon House, Barrow Street, Dublin 4, Irland. Mit Ihrer
+          Einwilligung erfasst Google Analytics unter anderem aufgerufene
+          Seiten, Verweildauer, Herkunft des Zugriffs (Referrer), Browser- und
+          Gerätetyp sowie einen groben, aus der IP-Adresse abgeleiteten
+          Standort. Die IP-Adresse wird von Google Analytics 4 grundsätzlich
+          gekürzt und nicht dauerhaft gespeichert. Zusätzlich melden wir das
+          Ereignis <code>generate_lead</code>, wenn eine Anfrage über das
+          Kontaktformular abgesendet wurde — übermittelt wird dabei
+          ausschließlich die gewählte Projektart, keine Ihrer Eingaben.
+        </p>
+        <p>
+          Dabei werden Cookies gesetzt, insbesondere <code>_ga</code> und{" "}
+          <code>_ga_&lt;ID&gt;</code>. Wir betreiben Google Analytics im
+          Consent Mode und übermitteln dauerhaft{" "}
+          <code>ad_storage: denied</code>, <code>ad_user_data: denied</code> und{" "}
+          <code>ad_personalization: denied</code>. Es findet daher keine
+          Verarbeitung zu Werbezwecken, keine Verknüpfung mit Google Ads und
+          keine geräteübergreifende Profilbildung statt. Google Signals ist
+          nicht aktiviert.
+        </p>
+
+        <h3 className="mt-6">3.3 Gemeinsame Regelungen / Common provisions</h3>
         <p>
           <strong>Rechtsgrundlage</strong> für das Speichern und Auslesen von
           Informationen auf Ihrem Endgerät ist § 25 Abs. 1 TDDDG, für die
@@ -123,7 +152,10 @@ export default function Datenschutz() {
           Microsoft Corporation in die USA kann nicht ausgeschlossen werden.
           Microsoft ist unter dem EU-US Data Privacy Framework zertifiziert; für
           die Verarbeitung gelten ergänzend die Standardvertragsklauseln der
-          EU-Kommission.
+          EU-Kommission. Entsprechendes gilt für Google: Vertragspartner ist die
+          Google Ireland Limited, eine Übermittlung an die Google LLC in die USA
+          ist jedoch nicht ausgeschlossen. Auch Google ist unter dem EU-US Data
+          Privacy Framework zertifiziert.
         </p>
         <p>
           <strong>Widerruf:</strong> Sie können Ihre Einwilligung jederzeit mit
@@ -134,22 +166,33 @@ export default function Datenschutz() {
         <p>
           Ihre Entscheidung wird ausschließlich lokal in Ihrem Browser
           (localStorage) gespeichert, damit wir Sie nicht bei jedem Seitenaufruf
-          erneut fragen müssen. Weitere Informationen finden Sie in der{" "}
+          erneut fragen müssen. Bei einem Widerruf löschen wir die von den
+          Diensten gesetzten Cookies unmittelbar aus Ihrem Browser. Weitere
+          Informationen finden Sie in der{" "}
           <a
             href="https://privacy.microsoft.com/de-de/privacystatement"
             target="_blank"
             rel="noopener noreferrer"
           >
             Datenschutzerklärung von Microsoft
+          </a>{" "}
+          sowie in der{" "}
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Datenschutzerklärung von Google
           </a>
           .
         </p>
         <p>
-          This website loads Microsoft Clarity only after you opt in via the
-          consent banner. It records pseudonymised session replays and heatmaps;
-          contact-form inputs are masked in the browser and never reach
-          Microsoft. Advertising storage is explicitly denied. You can withdraw
-          your consent at any time using the button above.
+          This website loads Microsoft Clarity and Google Analytics only after
+          you opt in via the consent banner. Clarity records pseudonymised
+          session replays and heatmaps; contact-form inputs are masked in the
+          browser and never reach Microsoft. Advertising storage is explicitly
+          denied for both services. You can withdraw your consent at any time
+          using the button above, which also deletes the cookies they set.
         </p>
       </section>
 
@@ -162,8 +205,8 @@ export default function Datenschutz() {
            Fonts, CDNs, eingebettete Karten oder Videoplattformen) nachgeladen.
            Verbindungen zu Dritten entstehen nur in zwei Fällen: bei der
            Übermittlung des Kontaktformulars an Web3Forms, sobald Sie eine
-           Anfrage absenden, und beim Laden von Microsoft Clarity, sofern Sie
-           zuvor eingewilligt haben (siehe Ziffer 3).
+           Anfrage absenden, und beim Laden von Microsoft Clarity sowie Google
+           Analytics, sofern Sie zuvor eingewilligt haben (siehe Ziffer 3).
         </p>
       </section>
 

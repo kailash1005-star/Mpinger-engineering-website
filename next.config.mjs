@@ -51,14 +51,30 @@ const CLARITY_SCRIPT_ORIGINS = "https://*.clarity.ms";
 const CLARITY_IMG_ORIGINS = "https://*.clarity.ms";
 const CLARITY_CONNECT_ORIGINS = "https://*.clarity.ms";
 
+// Google Analytics 4. Like Clarity it touches three directives:
+//   script-src  — gtag.js is served from googletagmanager.com.
+//   connect-src — hits go to google-analytics.com, and GA4 routes EU traffic
+//     through regional endpoints (region1.google-analytics.com and siblings),
+//     which is why this needs the wildcard rather than the bare host.
+//   img-src     — GA still falls back to a pixel when sendBeacon/fetch is
+//     unavailable, so a strict img-src otherwise drops those hits silently.
+//
+// google.com / google.<tld> are deliberately absent: those are the ad
+// remarketing and conversion-linker destinations. We send ad_storage,
+// ad_user_data and ad_personalization as denied, and the CSP enforces that
+// rather than trusting the tag to respect it.
+const GA_SCRIPT_ORIGINS = "https://www.googletagmanager.com";
+const GA_IMG_ORIGINS = "https://*.google-analytics.com https://www.googletagmanager.com";
+const GA_CONNECT_ORIGINS = "https://*.google-analytics.com https://www.googletagmanager.com";
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${CLARITY_SCRIPT_ORIGINS}${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' ${CLARITY_SCRIPT_ORIGINS} ${GA_SCRIPT_ORIGINS}${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${CLARITY_IMG_ORIGINS}`,
+  `img-src 'self' data: blob: ${CLARITY_IMG_ORIGINS} ${GA_IMG_ORIGINS}`,
   "media-src 'self' blob:",
   "font-src 'self'",
-  `connect-src 'self' ${FORM_ENDPOINT_ORIGIN} ${CLARITY_CONNECT_ORIGINS}${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self' ${FORM_ENDPOINT_ORIGIN} ${CLARITY_CONNECT_ORIGINS} ${GA_CONNECT_ORIGINS}${isDev ? " ws: wss:" : ""}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
