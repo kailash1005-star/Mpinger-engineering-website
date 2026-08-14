@@ -14,6 +14,7 @@ const NAV_LINKS = [
 
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -73,8 +74,50 @@ export default function SiteHeader() {
             DE · Hannover / IN · Coimbatore
           </span>
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+
+          {/* Mobile menu toggle — only below md, where the inline <nav> is
+              hidden. Restores the section shortcuts on phones. */}
+          <button
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+            className={`md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border ${
+              lightHeader ? "border-slate-300 text-slate-700" : "border-white/40 text-white"
+            }`}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              {menuOpen ? (
+                <path d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              )}
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* Mobile dropdown — mirrors NAV_LINKS. Closes on selection. */}
+      {menuOpen && (
+        <nav
+          className={`md:hidden border-t px-6 py-3 flex flex-col gap-1 ${
+            lightHeader ? "bg-white/95 border-slate-200" : "bg-black/70 border-white/10"
+          }`}
+        >
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.label === "Contact" ? "/contact" : pathname === "/" ? link.href : `/${link.href}`}
+              onClick={() => setMenuOpen(false)}
+              className={`text-[13px] font-semibold uppercase tracking-[0.14em] py-2.5 ${
+                link.label === "Contact" ? "text-[#1d6fb5]" : linkColor
+              }`}
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      )}
     </header>
   );
 }
