@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import CookieConsent from "@/components/CookieConsent";
 import { SITE_URL, ORGANIZATION_JSON_LD, WEBSITE_JSON_LD } from "@/lib/seo";
+import GoogleTranslate from "@/components/GoogleTranslate";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -136,6 +137,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
+        <GoogleTranslate />
         {/* Renders the consent banner and, only once consent is given, the
             Microsoft Clarity tag. Last in the body so it never delays the
             page it measures. */}
