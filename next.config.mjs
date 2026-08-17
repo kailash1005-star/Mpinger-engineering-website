@@ -23,7 +23,6 @@ const isDev = process.env.NODE_ENV === "development";
 // the browser blocks the request before it leaves the page — connect-src has no
 // implicit allowance for "the endpoint this app obviously needs".
 const FORM_ENDPOINT_ORIGIN = "https://api.web3forms.com";
-const GOOGLE_TRANSLATE_ORIGINS = "https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com";
 
 // Microsoft Clarity spreads itself across three directives, and the snippet
 // Microsoft hands out only reveals the first of them:
@@ -70,13 +69,12 @@ const GA_CONNECT_ORIGINS = "https://*.google-analytics.com https://www.googletag
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${CLARITY_SCRIPT_ORIGINS} ${GA_SCRIPT_ORIGINS} ${GOOGLE_TRANSLATE_ORIGINS}${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' ${CLARITY_SCRIPT_ORIGINS} ${GA_SCRIPT_ORIGINS}${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${CLARITY_IMG_ORIGINS} ${GA_IMG_ORIGINS}`,
   "media-src 'self' blob:",
   "font-src 'self'",
-  `frame-src 'self' ${GOOGLE_TRANSLATE_ORIGINS}`,
-  `connect-src 'self' ${FORM_ENDPOINT_ORIGIN} ${CLARITY_CONNECT_ORIGINS} ${GA_CONNECT_ORIGINS} ${GOOGLE_TRANSLATE_ORIGINS}${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self' ${FORM_ENDPOINT_ORIGIN} ${CLARITY_CONNECT_ORIGINS} ${GA_CONNECT_ORIGINS}${isDev ? " ws: wss:" : ""}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
