@@ -3,6 +3,8 @@
 import { FormEvent, useState } from "react";
 import { trackEvent, trackTag, upgradeSession } from "@/lib/clarity";
 import { trackLead, trackLeadFailed } from "@/lib/gtag";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 // Web3Forms access keys are public client-side identifiers, so this is safe to
 // ship in the bundle.
@@ -16,6 +18,7 @@ export const WEB3FORMS_ACCESS_KEY: string = "ead061de-346f-4cd4-a55a-aa878ae22cf
 type FormState = "idle" | "sending" | "success" | "error";
 
 export default function EngineeringContactForm() {
+  const t = useTranslations("form");
   const [state, setState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -79,51 +82,51 @@ export default function EngineeringContactForm() {
           recording is not the place for a customer's confidential geometry. */}
       <div className="grid gap-6 md:grid-cols-2">
         <label className="engineering-field">
-          <span>Name <b>*</b></span>
+           <span>{t("name")} <b>*</b></span>
           <input type="text" name="name" autoComplete="name" required data-clarity-mask="true" />
         </label>
         <label className="engineering-field">
-          <span>Work email <b>*</b></span>
+           <span>{t("email")} <b>*</b></span>
           <input type="email" name="email" autoComplete="email" required data-clarity-mask="true" />
         </label>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <label className="engineering-field">
-          <span>Company</span>
+           <span>{t("company")}</span>
           <input type="text" name="company" autoComplete="organization" data-clarity-mask="true" />
         </label>
         <label className="engineering-field">
-          <span>Project type</span>
+           <span>{t("projectType")}</span>
           <select name="project_type" defaultValue="">
-            <option value="" disabled>Select a requirement</option>
-            <option value="5-axis milling">5-axis milling</option>
-            <option value="Turning / mill-turn">Turning / mill-turn</option>
-            <option value="Prototype or series">Prototype or series</option>
-            <option value="Quality inspection">Quality inspection</option>
-            <option value="Other">Other</option>
+             <option value="" disabled>{t("selectRequirement")}</option>
+             <option value="5-axis milling">{t("milling")}</option>
+             <option value="Turning / mill-turn">{t("turning")}</option>
+             <option value="Prototype or series">{t("prototype")}</option>
+             <option value="Quality inspection">{t("quality")}</option>
+             <option value="Other">{t("other")}</option>
           </select>
         </label>
       </div>
 
       <label className="engineering-field">
-        <span>Tell us about the part <b>*</b></span>
-        <textarea name="message" required rows={6} data-clarity-mask="true" placeholder="Material, quantity, tolerances, target date — whatever is useful at this stage." />
+         <span>{t("message")} <b>*</b></span>
+         <textarea name="message" required rows={6} data-clarity-mask="true" placeholder={t("message")} />
       </label>
 
       <input type="hidden" name="subject" value="New enquiry from Mpinger Engineering" />
       <input type="hidden" name="from_name" value="Mpinger Engineering website" />
 
       <div className="flex flex-col gap-5 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <p className="max-w-md text-xs leading-relaxed text-slate-500">We use your details only to respond to this enquiry. See our <a className="text-[#1d6fb5] underline" href="/datenschutz">privacy notice</a>.</p>
+         <p className="max-w-md text-xs leading-relaxed text-slate-500">{t("privacy")} <Link className="text-[#1d6fb5] underline" href="/datenschutz">{t("privacyLink")}</Link>.</p>
         <button type="submit" disabled={state === "sending"} className="mono-font inline-flex min-h-12 items-center justify-center gap-3 rounded-md bg-gradient-to-r from-[#0b4e86] to-[#3f97dd] px-7 text-[11px] font-bold uppercase tracking-[0.25em] text-white shadow-[0_10px_28px_rgba(11,78,134,0.28)] transition-all duration-300 hover:from-[#0d5996] hover:to-[#56a8e6] disabled:cursor-wait disabled:opacity-65">
-          {state === "sending" ? "Sending..." : "Send enquiry"}
+           {state === "sending" ? t("sending") : t("send")}
           {state !== "sending" && <span aria-hidden="true">↗</span>}
         </button>
       </div>
 
       <div aria-live="polite" role="status">
-        {state === "success" && <p className="text-sm font-semibold text-[#0b4e86]">Message received. We&apos;ll be in touch soon.</p>}
+         {state === "success" && <p className="text-sm font-semibold text-[#0b4e86]">{t("success")}</p>}
         {state === "error" && <p className="text-sm font-semibold text-red-700">{errorMessage}</p>}
       </div>
     </form>

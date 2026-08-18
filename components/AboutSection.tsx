@@ -2,27 +2,28 @@
 
 import { motion, useInView, useMotionValue, useSpring, useMotionValueEvent } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import SectionHeading from "./SectionHeading";
 
 const STATS = [
-  { value: 11000, suffix: " ft²", label: "Dust-Controlled Shopfloor" },
-  { value: 20, suffix: "+", label: "CNC Machines In Operation" },
-  { value: 5, suffix: "-Axis", label: "Simultaneous Machining" },
-  { value: 8, suffix: "+", label: "Industries Served" },
+  { value: 11000, suffix: " ft²", labelKey: "stat1" },
+  { value: 20, suffix: "+", labelKey: "stat2" },
+  { value: 5, suffix: "-Axis", labelKey: "stat3" },
+  { value: 8, suffix: "+", labelKey: "stat4" },
 ];
 
 const PILLARS = [
   {
-    title: "German-Indian Manufacturing Bridge",
-    text: "Coordinated from Hannover, machined in Coimbatore — one central contact, one standard of quality.",
+    titleKey: "pillar1Title",
+    textKey: "pillar1Text",
   },
   {
-    title: "Virtual Factory Network",
-    text: "Qualified partners for casting, die casting, sheet metal and surface treatment extend our machining core.",
+    titleKey: "pillar2Title",
+    textKey: "pillar2Text",
   },
   {
-    title: "Prototype To Series",
-    text: "Quality-assured components with punctual delivery — at production costs up to 70% below European levels.",
+    titleKey: "pillar3Title",
+    textKey: "pillar3Text",
   },
 ];
 
@@ -68,14 +69,15 @@ function StatCounter({ value, suffix }: { value: number; suffix: string }) {
 }
 
 export default function AboutSection() {
+  const t = useTranslations("about");
   return (
     <section id="about" className="relative bg-white py-24 md:py-32">
       <div className="relative max-w-7xl mx-auto px-6 md:px-12">
         <SectionHeading
           index="01"
-          eyebrow="The Company"
-          title="Precision Is Our Profession"
-          description="Mpinger Engineering India Private Limited is an ISO 9001:2015 certified manufacturer of high-precision CNC-milled and turned components — built for parts that demand precise detail and tight tolerances."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          description={t("description")}
         />
 
         <div className="mt-14 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
@@ -90,7 +92,7 @@ export default function AboutSection() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/backdrops/digital-thread.webp"
-              alt="From CAD program to machined component — the Mpinger digital thread"
+              alt={t("imgAlt")}
               loading="lazy"
               className="w-full h-full object-cover"
             />
@@ -106,7 +108,7 @@ export default function AboutSection() {
           <div className="flex flex-col space-y-2">
             {PILLARS.map((pillar, i) => (
               <motion.div
-                key={pillar.title}
+                key={pillar.titleKey}
                 initial={{ opacity: 0, x: 32 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -117,10 +119,10 @@ export default function AboutSection() {
                   {`0${i + 1}`}
                 </span>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-slate-600 leading-relaxed">{pillar.text}</p>
+                   <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                     {t(pillar.titleKey)}
+                   </h3>
+                   <p className="mt-1 text-sm text-slate-600 leading-relaxed">{t(pillar.textKey)}</p>
                 </div>
               </motion.div>
             ))}
@@ -134,10 +136,10 @@ export default function AboutSection() {
               className="flex flex-wrap gap-3 pt-3"
             >
               <span className="mono-font text-[11px] uppercase tracking-[0.2em] font-bold text-white bg-gradient-to-r from-[#0b4e86] to-[#1d6fb5] rounded-md px-4 py-2.5">
-                ISO 9001:2015 Certified
+                 {t("certified")}
               </span>
               <span className="mono-font text-[11px] uppercase tracking-[0.2em] font-semibold text-[#0b4e86] border border-[#3f97dd]/50 bg-[#3f97dd]/10 rounded-md px-4 py-2.5">
-                AS9100 — Stage 1 Completed
+                 {t("stage")}
               </span>
             </motion.div>
           </div>
@@ -147,7 +149,7 @@ export default function AboutSection() {
         <div className="mt-10 md:mt-14 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {STATS.map((stat, i) => (
             <motion.div
-              key={stat.label}
+              key={stat.labelKey}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -157,7 +159,7 @@ export default function AboutSection() {
               <StatCounter value={stat.value} suffix={stat.suffix} />
               {/* Wide tracking pushed short labels onto three lines on a phone */}
               <span className="mono-font text-[9px] uppercase tracking-[0.12em] md:tracking-[0.25em] text-slate-500 leading-snug md:leading-relaxed">
-                {stat.label}
+                 {t(stat.labelKey)}
               </span>
             </motion.div>
           ))}
@@ -172,7 +174,7 @@ export default function AboutSection() {
           className="mt-10 flex flex-wrap items-center gap-2"
         >
           <span className="mono-font text-[10px] uppercase tracking-[0.35em] text-slate-500 mr-3">
-            Industries Served
+             {t("industries")}
           </span>
           {INDUSTRIES.map((industry) => (
             <span

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import CookieConsent from "@/components/CookieConsent";
+import { getLocale } from "next-intl/server";
 import { SITE_URL, ORGANIZATION_JSON_LD, WEBSITE_JSON_LD } from "@/lib/seo";
 
 const geistSans = localFont({
@@ -109,13 +109,20 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // This layout sits above the [locale] segment, so it has no `params` to read.
+  // getLocale() resolves the locale the proxy/middleware negotiated for this
+  // request, which is what keeps <html lang> honest: it was previously pinned
+  // to "en", so a German or French page still announced itself as English to
+  // screen readers and to Google's language detection.
+  const locale = await getLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         {/* Structured data — lets Google render an entity panel for the
             company rather than a plain blue link. */}
@@ -135,11 +142,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
+        {/* The consent banner used to be rendered here, but it needs
+            translations and this layout is above NextIntlClientProvider — so it
+            now lives at the end of app/[locale]/layout.tsx instead. */}
         {children}
-        {/* Renders the consent banner and, only once consent is given, the
-            Microsoft Clarity tag. Last in the body so it never delays the
-            page it measures. */}
-        <CookieConsent />
       </body>
     </html>
   );

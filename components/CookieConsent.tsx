@@ -1,7 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+// next-intl's Link, not next/link: the plain one pointed at "/datenschutz"
+// without the locale segment, dropping the visitor's language.
+import { Link } from "@/i18n/navigation";
 import ClarityScript from "./ClarityScript";
 import GoogleAnalytics from "./GoogleAnalytics";
 import { CLARITY_ENABLED, clearClarityCookies, denyClarityConsent } from "@/lib/clarity";
@@ -30,6 +33,7 @@ import {
 export default function CookieConsent() {
   const [status, setStatus] = useState<ConsentStatus | null>(null);
   const [visible, setVisible] = useState(false);
+  const t = useTranslations("consent");
 
   useEffect(() => {
     // Read after mount: localStorage does not exist during the server render,
@@ -96,22 +100,13 @@ export default function CookieConsent() {
                   id="consent-heading"
                   className="mono-font text-[10px] font-bold uppercase tracking-[0.35em] text-[#1d6fb5]"
                 >
-                  Cookies &amp; Analyse
+                  {t("heading")}
                 </h2>
-                <p className="text-sm leading-relaxed text-slate-700">
-                  Wir möchten mit Microsoft Clarity und Google Analytics messen, wie diese Website
-                  genutzt wird, um sie zu verbessern. Dabei werden Cookies gesetzt und Ihre
-                  Sitzung pseudonymisiert aufgezeichnet. Werbe-Tracking findet nicht statt. Das
-                  geschieht nur mit Ihrer Einwilligung — die Website funktioniert ohne
-                  Einschränkung, wenn Sie ablehnen.
-                </p>
+                <p className="text-sm leading-relaxed text-slate-700">{t("body")}</p>
                 <p className="text-xs leading-relaxed text-slate-500">
-                  We would like to measure how this site is used, via Microsoft Clarity and Google
-                  Analytics. This sets cookies and records a pseudonymised session replay. No
-                  advertising tracking. Only with your consent — you can withdraw it at any time.
-                  Details in our{" "}
+                  {t("details")}{" "}
                   <Link href="/datenschutz" className="text-[#1d6fb5] underline">
-                    Datenschutzerklärung
+                    {t("privacyLink")}
                   </Link>
                   .
                 </p>
@@ -123,14 +118,14 @@ export default function CookieConsent() {
                   onClick={() => decide("granted")}
                   className="mono-font inline-flex min-h-11 items-center justify-center rounded-md bg-gradient-to-r from-[#0b4e86] to-[#3f97dd] px-6 text-[11px] font-bold uppercase tracking-[0.25em] text-white shadow-[0_10px_28px_rgba(11,78,134,0.28)] transition-all duration-300 hover:from-[#0d5996] hover:to-[#56a8e6]"
                 >
-                  Akzeptieren
+                  {t("accept")}
                 </button>
                 <button
                   type="button"
                   onClick={() => decide("denied")}
                   className="mono-font inline-flex min-h-11 items-center justify-center rounded-md border border-[#1d6fb5]/40 bg-white px-6 text-[11px] font-bold uppercase tracking-[0.25em] text-[#0b4e86] transition-colors duration-300 hover:border-[#1d6fb5] hover:text-[#1d6fb5]"
                 >
-                  Ablehnen
+                  {t("reject")}
                 </button>
               </div>
             </div>

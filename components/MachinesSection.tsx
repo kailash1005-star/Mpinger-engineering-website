@@ -8,6 +8,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { MACHINES, Machine } from "./siteData";
 
 function MachineSlide({ machine, index }: { machine: Machine; index: number }) {
@@ -83,6 +84,7 @@ function MachineSlide({ machine, index }: { machine: Machine; index: number }) {
 }
 
 export default function MachinesSection() {
+  const t = useTranslations("machines");
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const machineCount = MACHINES.length;
@@ -123,16 +125,14 @@ export default function MachinesSection() {
             </span>
             <span className="w-10 h-[2px] bg-[#3f97dd]/60" />
             <span className="mono-font text-[11px] tracking-[0.4em] text-slate-500 uppercase">
-              The Machine Park
+               {t("eyebrow")}
             </span>
           </div>
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 uppercase leading-none">
-            Machines & Infrastructure
+             {t("title")}
           </h2>
           <p className="text-sm md:text-base font-normal text-slate-600 max-w-2xl leading-relaxed text-balance">
-            A high-technology park of 5-axis milling, mill-turn and turn-mill centers from DMG
-            MORI, MAZAK, Hüller Hille, IBARMIA and Chiron — inside an 11,000 ft² dust-controlled
-            shopfloor. Keep scrolling to move through the park.
+             {t("description")}
           </p>
         </motion.div>
       </div>
@@ -151,7 +151,7 @@ export default function MachinesSection() {
           <div className="absolute bottom-0 left-0 right-0 px-6 md:px-16 pb-6 pointer-events-none">
             <div className="max-w-6xl mx-auto flex items-center justify-between space-x-6">
               <span className="mono-font text-[10px] tracking-[0.35em] text-slate-500 uppercase whitespace-nowrap">
-                Unit {String(activeIndex + 1).padStart(2, "0")} / {String(machineCount).padStart(2, "0")}
+                 {t("unit", { current: String(activeIndex + 1).padStart(2, "0"), total: String(machineCount).padStart(2, "0") })}
               </span>
               <div className="relative flex-1 h-[3px] bg-slate-200 rounded-full overflow-hidden">
                 <motion.div
@@ -160,7 +160,7 @@ export default function MachinesSection() {
                 />
               </div>
               <span className="mono-font text-[10px] tracking-[0.35em] text-slate-500 uppercase whitespace-nowrap hidden md:inline">
-                Scroll to Traverse
+                 {t("scroll")}
               </span>
             </div>
           </div>

@@ -2,20 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 const NAV_LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Parts", href: "#parts" },
-  { label: "Machines", href: "#machines" },
-  { label: "Quality", href: "#quality" },
-  { label: "Global", href: "#global" },
-  { label: "Contact", href: "#contact" },
+  { key: "about", href: "#about" },
+  { key: "parts", href: "#parts" },
+  { key: "machines", href: "#machines" },
+  { key: "quality", href: "#quality" },
+  { key: "global", href: "#global" },
+  { key: "contact", href: "#contact" },
 ];
 
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations("nav");
 
   useEffect(() => {
     // Header turns light once the visitor leaves the dark hero (400vh tall)
@@ -25,7 +29,7 @@ export default function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const lightHeader = pathname !== "/" || scrolled;
+  const lightHeader = pathname !== `/${locale}` || scrolled;
   const linkColor = lightHeader
     ? "text-slate-600 hover:text-[#1d6fb5]"
     : "text-white/85 hover:text-[#7cbcf0]";
@@ -40,7 +44,7 @@ export default function SiteHeader() {
     >
       <div className="flex items-center justify-between px-6 md:px-10 py-3.5">
         {/* Brand — logo only */}
-        <a href={pathname === "/" ? "#top" : "/"} className="flex items-center group">
+          <Link href="/" className="flex items-center group">
           <span
             className={`rounded-lg px-3.5 py-2 transition-all duration-300 group-hover:scale-[1.03] ${
               lightHeader ? "bg-white" : "bg-white shadow-[0_0_24px_rgba(255,255,255,0.10)]"
@@ -49,19 +53,29 @@ export default function SiteHeader() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.png" alt="mpinger Engineering" className="h-9 md:h-10 w-auto" />
           </span>
-        </a>
+          </Link>
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.label === "Contact" ? "/contact" : pathname === "/" ? link.href : `/${link.href}`}
-              className={`text-[13px] lg:text-sm font-semibold uppercase tracking-[0.14em] transition-colors duration-300 ${linkColor}`}
-            >
-              {link.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) =>
+            link.key === "contact" ? (
+              <Link
+                key={link.href}
+                href="/contact"
+                className={`text-[13px] lg:text-sm font-semibold uppercase tracking-[0.14em] transition-colors duration-300 ${linkColor}`}
+              >
+                {t(link.key)}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={pathname === `/${locale}` ? link.href : `/${locale}${link.href}`}
+                className={`text-[13px] lg:text-sm font-semibold uppercase tracking-[0.14em] transition-colors duration-300 ${linkColor}`}
+              >
+                {t(link.key)}
+              </a>
+            )
+          )}
         </nav>
 
         {/* Status */}
@@ -107,13 +121,13 @@ export default function SiteHeader() {
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
-              href={link.label === "Contact" ? "/contact" : pathname === "/" ? link.href : `/${link.href}`}
+              href={link.key === "contact" ? `/${locale}/contact` : pathname === `/${locale}` ? link.href : `/${locale}${link.href}`}
               onClick={() => setMenuOpen(false)}
               className={`text-[13px] font-semibold uppercase tracking-[0.14em] py-2.5 ${
-                link.label === "Contact" ? "text-[#1d6fb5]" : linkColor
+                link.key === "contact" ? "text-[#1d6fb5]" : linkColor
               }`}
             >
-              {link.label}
+              {t(link.key)}
             </a>
           ))}
         </nav>

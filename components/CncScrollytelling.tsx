@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   motion,
   useScroll,
@@ -19,17 +20,17 @@ const SOURCES = { desktop: "/video.mp4", mobile: "/video-mobile.mp4" };
 const FRAMES = Array.from({ length: 24 }, (_, i) => `/frames-portrait/hero-${i + 1}.webp`);
 
 interface Beat {
-  title: string;
-  subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
   start: number;
   end: number;
 }
 
 const QUICK_LINKS = [
-  { label: "Machines", sub: "The 5-Axis Park", href: "#machines", image: "/machines/dmu-210p.webp" },
-  { label: "Parts", sub: "What We Manufacture", href: "#parts", image: "/parts/impeller-hub.webp" },
-  { label: "Quality", sub: "Metrology & Validation", href: "#quality", image: "/quality/hexagon-cmm.webp" },
-  { label: "Global", sub: "German-Indian Bridge", href: "#global", image: "/backdrops/global-network.webp" },
+  { key: "machines", subKey: "machinesSub", href: "#machines", image: "/machines/dmu-210p.webp" },
+  { key: "parts", subKey: "partsSub", href: "#parts", image: "/parts/impeller-hub.webp" },
+  { key: "quality", subKey: "qualitySub", href: "#quality", image: "/quality/hexagon-cmm.webp" },
+  { key: "global", subKey: "globalSub", href: "#global", image: "/backdrops/global-network.webp" },
 ];
 
 /**
@@ -43,30 +44,26 @@ const QUICK_LINKS = [
  */
 const BEATS: Beat[] = [
   {
-    title: "PROVEN BEFORE WE CUT",
-    subtitle:
-      "Every setup is simulated and collision-checked before a tool touches metal — so the first part and the thousandth come off identical.",
+    titleKey: "beat1Title",
+    subtitleKey: "beat1Text",
     start: 0.0,
     end: 0.2,
   },
   {
-    title: "COMPLETE IN ONE SETUP",
-    subtitle:
-      "5-axis milling and mill-turn finish complex geometry in a single clamping — fewer setups, truer position, shorter lead times.",
+    titleKey: "beat2Title",
+    subtitleKey: "beat2Text",
     start: 0.25,
     end: 0.45,
   },
   {
-    title: "HELD TO 0.001 MM",
-    subtitle:
-      "Aerospace alloys, hardened steels and exotics — machined to tolerance across the full production run, not just the sample.",
+    titleKey: "beat3Title",
+    subtitleKey: "beat3Text",
     start: 0.5,
     end: 0.7,
   },
   {
-    title: "MEASURED, THEN RELEASED",
-    subtitle:
-      "100% verified on calibrated CMMs, with documentation your quality team can audit. ISO 9001:2015 certified.",
+    titleKey: "beat4Title",
+    subtitleKey: "beat4Text",
     start: 0.75,
     end: 0.95,
   },
@@ -75,9 +72,11 @@ const BEATS: Beat[] = [
 function BeatOverlay({
   beat,
   scrollYProgress,
+  t,
 }: {
   beat: Beat;
   scrollYProgress: MotionValue<number>;
+  t: (key: string) => string;
 }) {
   // Calculate 10% boundaries of range
   const range = beat.end - beat.start;
@@ -115,10 +114,10 @@ function BeatOverlay({
           className="absolute -inset-x-8 -inset-y-4 bg-[radial-gradient(ellipse_at_center,rgba(5,5,5,0.78)_0%,rgba(5,5,5,0.55)_40%,rgba(5,5,5,0.18)_68%,rgba(5,5,5,0)_82%)] md:hidden"
         />
         <h3 className="relative text-[26px] md:text-5xl font-extrabold tracking-tight text-white uppercase leading-[1.05] md:leading-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.85)]">
-          {beat.title}
+          {t(beat.titleKey)}
         </h3>
         <p className="relative text-[13px] md:text-base font-normal text-white/75 md:text-white/60 max-w-[19rem] md:max-w-lg leading-relaxed text-balance drop-shadow-[0_1px_10px_rgba(0,0,0,0.8)]">
-          {beat.subtitle}
+          {t(beat.subtitleKey)}
         </p>
       </div>
     </motion.div>
@@ -126,6 +125,7 @@ function BeatOverlay({
 }
 
 export default function CncScrollytelling() {
+  const t = useTranslations("hero");
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -213,10 +213,10 @@ export default function CncScrollytelling() {
 
             <div className="flex flex-col items-center space-y-2 text-center">
               <span className="mono-font text-xs uppercase tracking-[0.3em] text-neutral-500">
-                Mpinger Engineering
+               {t("brand")}
               </span>
               <h2 className="text-sm font-semibold tracking-widest text-white/90 uppercase">
-                Precision CNC Manufacturing
+                 {t("title")}
               </h2>
             </div>
 
@@ -238,7 +238,7 @@ export default function CncScrollytelling() {
           <ScrollImageSequence
             progress={scrollYProgress}
             frames={FRAMES}
-            alt="5-axis CNC machining sequence — simulation through finished component"
+            alt={t("imgAlt")}
             // Frames are pre-cropped to 3:4, so cover fills a portrait screen
             // without letterboxing and without the extreme zoom a 16:9 source
             // would suffer here
@@ -262,10 +262,11 @@ export default function CncScrollytelling() {
         {/* Text Overlays - absolute scrollytelling beats */}
         <div className="absolute inset-0 flex items-center justify-center p-6 md:p-12 pointer-events-none">
           {BEATS.map((beat, index) => (
-            <BeatOverlay
-              key={index}
-              beat={beat}
-              scrollYProgress={scrollYProgress}
+             <BeatOverlay
+               key={index}
+               beat={beat}
+               scrollYProgress={scrollYProgress}
+               t={t}
             />
           ))}
         </div>
@@ -276,7 +277,7 @@ export default function CncScrollytelling() {
           className="absolute bottom-8 left-0 right-0 flex flex-col items-center space-y-2 text-center pointer-events-none"
         >
           <span className="mono-font text-[9px] uppercase tracking-[0.5em] text-neutral-500">
-            Scroll to Manufacture
+             {t("scroll")}
           </span>
           <div className="w-[1px] h-12 bg-gradient-to-b from-[#3f97dd]/60 to-transparent animate-pulse" />
         </motion.div>
@@ -299,7 +300,7 @@ export default function CncScrollytelling() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={link.image}
-                  alt={link.label}
+                   alt={t(link.key)}
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover opacity-25 transition-opacity duration-300 group-hover:opacity-45"
                 />
@@ -308,10 +309,10 @@ export default function CncScrollytelling() {
                 {/* Label */}
                 <div className="relative h-full flex flex-col justify-end p-3.5 md:p-4">
                   <span className="mono-font text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#7cbcf0]">
-                    {`0${index + 1} // ${link.sub}`}
+                     {`0${index + 1} // ${t(link.subKey)}`}
                   </span>
                   <span className="mt-1 flex items-center justify-between text-white font-bold uppercase tracking-wide text-sm md:text-base">
-                    {link.label}
+                     {t(link.key)}
                     <span className="text-[#7cbcf0] transition-transform duration-300 group-hover:translate-x-1">
                       →
                     </span>

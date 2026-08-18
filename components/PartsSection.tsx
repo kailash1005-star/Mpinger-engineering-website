@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   motion,
   useScroll,
@@ -42,10 +43,9 @@ const CHAPTERS = [
     },
     poster: "/posters/industrial.webp",
     frames: seq("industrial"),
-    eyebrow: "What We Manufacture — 01",
-    title: "Industrial Components",
-    description:
-      "Impeller hubs, gear cases, turbocharger housings and heavy-engine components — 5-axis milled and turned in a single setup, held to 0.001 mm discipline.",
+    eyebrowKey: "industrial",
+    titleKey: "industrial",
+    descriptionKey: "industrialText",
     // scroll range this chapter's video scrubs across
     scrub: [0.0, 0.5] as [number, number],
     // beat sits on the opening showcase
@@ -59,10 +59,9 @@ const CHAPTERS = [
     },
     poster: "/posters/aerospace.webp",
     frames: seq("aerospace"),
-    eyebrow: "What We Manufacture — 02",
-    title: "Aerospace-Grade Precision",
-    description:
-      "Flight-critical geometries in demanding alloys — machined, measured on calibrated CMMs and validated before a single part leaves the floor.",
+    eyebrowKey: "aerospace",
+    titleKey: "aerospace",
+    descriptionKey: "aerospaceText",
     scrub: [0.5, 1.0] as [number, number],
     // beat sits on the first showcase, after the opening pan has settled
     beat: [0.625, 0.66, 0.75, 0.79] as [number, number, number, number],
@@ -78,9 +77,11 @@ const CUT = { aOut: [0.49, 0.505], bIn: [0.495, 0.51] };
 function ChapterBeat({
   chapter,
   scrollYProgress,
+  t,
 }: {
   chapter: (typeof CHAPTERS)[number];
   scrollYProgress: MotionValue<number>;
+  t: (key: string) => string;
 }) {
   const [start, fadedIn, fadeOut, end] = chapter.beat;
 
@@ -101,19 +102,20 @@ function ChapterBeat({
       className="absolute bottom-[14%] left-6 md:left-16 max-w-md md:max-w-lg flex flex-col space-y-3 pointer-events-none"
     >
       <span className="mono-font text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#7cbcf0] font-semibold">
-        {chapter.eyebrow}
+        {t(chapter.eyebrowKey)}
       </span>
       <h3 className="text-[26px] md:text-5xl font-extrabold tracking-tight text-white/95 uppercase leading-[1.02] md:leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.85)]">
-        {chapter.title}
+        {t(chapter.titleKey)}
       </h3>
       <p className="text-[13px] md:text-base text-white/70 md:text-white/60 leading-relaxed text-balance drop-shadow-[0_1px_10px_rgba(0,0,0,0.8)]">
-        {chapter.description}
+        {t(chapter.descriptionKey)}
       </p>
     </motion.div>
   );
 }
 
 export default function PartsSection() {
+  const t = useTranslations("parts");
   const containerRef = useRef<HTMLDivElement>(null);
   const videoARef = useRef<HTMLVideoElement>(null);
   const videoBRef = useRef<HTMLVideoElement>(null);
@@ -175,7 +177,7 @@ export default function PartsSection() {
               <ScrollImageSequence
                 progress={timeA}
                 frames={CHAPTERS[0].frames}
-                alt={CHAPTERS[0].title}
+                alt={t(CHAPTERS[0].titleKey)}
                 fit="cover"
               />
             </motion.div>
@@ -188,7 +190,7 @@ export default function PartsSection() {
               <ScrollImageSequence
                 progress={timeB}
                 frames={CHAPTERS[1].frames}
-                alt={CHAPTERS[1].title}
+                alt={t(CHAPTERS[1].titleKey)}
                 fit="cover"
               />
             </motion.div>
@@ -233,8 +235,8 @@ export default function PartsSection() {
         {/* Section title — clears as the tour begins */}
         <SectionTitleCard
           index="02"
-          eyebrow="What We Manufacture"
-          title="Parts"
+           eyebrow={t("eyebrow")}
+           title={t("title")}
           scrollYProgress={scrollYProgress}
         />
 
@@ -253,18 +255,19 @@ export default function PartsSection() {
 
         {/* Minimal text beats — one per chapter, timed to its steadiest pan */}
         {CHAPTERS.map((chapter) => (
-          <ChapterBeat
-            key={chapter.id}
-            chapter={chapter}
-            scrollYProgress={scrollYProgress}
+             <ChapterBeat
+              key={chapter.id}
+              chapter={chapter}
+              scrollYProgress={scrollYProgress}
+              t={t}
           />
         ))}
 
         {/* Chapter rail — desktop */}
         <div className="absolute right-8 md:right-12 top-1/2 -translate-y-1/2 hidden md:flex flex-col space-y-8 pointer-events-none">
           {[
-            { label: "Industrial", progress: timeA },
-            { label: "Aerospace", progress: timeB },
+             { label: t("industrial"), progress: timeA },
+             { label: t("aerospace"), progress: timeB },
           ].map((item, index) => (
             <div key={item.label} className="flex items-center space-x-4">
               <div className="flex flex-col items-end">
@@ -312,7 +315,7 @@ export default function PartsSection() {
             {`0${activeChapter + 1}`}
           </span>
           <span className="mono-font text-[8px] uppercase tracking-[0.3em] text-white/50">
-            {activeChapter === 0 ? "Industrial" : "Aerospace"}
+             {activeChapter === 0 ? t("industrial") : t("aerospace")}
           </span>
         </div>
 
@@ -322,7 +325,7 @@ export default function PartsSection() {
           className="absolute bottom-6 inset-x-0 flex flex-col items-center space-y-2 pointer-events-none"
         >
           <span className="mono-font text-[9px] uppercase tracking-[0.5em] text-neutral-500">
-            Scroll to Tour the Parts
+             {t("scroll")}
           </span>
           <div className="w-[1px] h-10 bg-gradient-to-b from-[#3f97dd]/60 to-transparent animate-pulse" />
         </motion.div>
@@ -333,7 +336,7 @@ export default function PartsSection() {
           className="absolute bottom-[7%] inset-x-0 flex justify-center pointer-events-none"
         >
           <span className="mono-font text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-white/50 text-center px-6">
-            8 Component Families · ISO 9001:2015 · Validated Before Dispatch
+             {t("closing")}
           </span>
         </motion.div>
       </div>

@@ -1,16 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import SectionHeading from "./SectionHeading";
-
-const VALUE_PROPS = [
-  { title: "German Coordination", text: "One central contact in Hannover." },
-  { title: "Indian Manufacturing", text: "Production costs up to 70% lower." },
-  { title: "Virtual Factory", text: "Casting, sheet metal & surface-treatment partners." },
-  { title: "On-Time Delivery", text: "Professional logistics and export packaging." },
-  { title: "Transparent Dealings", text: "Full documentation, open communication." },
-  { title: "Dedicated Workforce", text: "Trained team, Lean Six Sigma practice." },
-];
 
 const LOCATIONS = [
   {
@@ -30,6 +22,8 @@ const LOCATIONS = [
 ];
 
 export default function GlobalSection() {
+  const t = useTranslations("global");
+  const props = t.raw("props") as string[];
   return (
     <section id="global" className="relative bg-[#06263f] py-24 md:py-32 overflow-hidden">
       {/* Global network backdrop */}
@@ -42,9 +36,9 @@ export default function GlobalSection() {
       <div className="relative max-w-7xl mx-auto px-6 md:px-12">
         <SectionHeading
           index="05"
-          eyebrow="German–Indian Manufacturing Bridge"
-          title="The Best Of Two Worlds"
-          description="German reliability combined with Indian precision manufacturing — one connected production network, coordinated from Hannover, machined in Coimbatore."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          description={t("description")}
           tone="dark"
         />
 
@@ -61,10 +55,10 @@ export default function GlobalSection() {
             >
               <div className="flex items-center justify-between mb-5">
                 <span className="mono-font text-[10px] uppercase tracking-[0.35em] text-[#7cbcf0] font-bold">
-                  {location.country}
+                  {i === 0 ? t("germany") : t("india")}
                 </span>
                 <span className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/50">
-                  {location.role}
+                  {i === 0 ? t("germanyRole") : t("indiaRole")}
                 </span>
               </div>
               <h3 className="text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
@@ -90,9 +84,11 @@ export default function GlobalSection() {
 
         {/* Compact value props — one line each */}
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {VALUE_PROPS.map((prop, i) => (
+          {props.map((item, i) => {
+            const [title, text] = item.split("|");
+            return (
             <motion.div
-              key={prop.title}
+              key={title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -101,11 +97,12 @@ export default function GlobalSection() {
             >
               <span className="w-2 h-2 rounded-full bg-gradient-to-br from-[#3f97dd] to-[#7cbcf0] flex-shrink-0" />
               <p className="text-sm leading-snug">
-                <span className="font-bold text-white">{prop.title}</span>
-                <span className="text-white/55"> — {prop.text}</span>
+                <span className="font-bold text-white">{title}</span>
+                <span className="text-white/55"> — {text}</span>
               </p>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

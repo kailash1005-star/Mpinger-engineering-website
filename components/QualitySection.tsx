@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import {
   motion,
   useScroll,
@@ -38,18 +39,16 @@ const FRAMES = Array.from(
 
 const BEATS = [
   {
-    eyebrow: "Quality Infrastructure",
-    title: "Measured. Validated. Delivered.",
-    description:
-      "Every component is verified on calibrated coordinate-measuring infrastructure inside a temperature-managed quality room — 100% documented before dispatch.",
+    eyebrowKey: "beatEyebrow",
+    titleKey: "beatTitle",
+    descriptionKey: "beatText",
     // sits on the opening showcase
     range: [0.01, 0.045, 0.1, 0.145] as [number, number, number, number],
   },
   {
-    eyebrow: "Metrology Park",
-    title: "Calibrated to 2.2 µm",
-    description:
-      "Hexagon Global CMM, FARO Arm Prime and Zoller presetting — backed by a full ledger of calibrated Mitutoyo instruments.",
+    eyebrowKey: "metrology",
+    titleKey: "metrologyTitle",
+    descriptionKey: "metrologyText",
     // sits on the quietest mid-tour hold
     range: [0.55, 0.585, 0.63, 0.67] as [number, number, number, number],
   },
@@ -58,9 +57,11 @@ const BEATS = [
 function Beat({
   beat,
   scrollYProgress,
+  t,
 }: {
   beat: (typeof BEATS)[number];
   scrollYProgress: MotionValue<number>;
+  t: (key: string) => string;
 }) {
   const [start, fadedIn, fadeOut, end] = beat.range;
 
@@ -81,19 +82,20 @@ function Beat({
       className="absolute bottom-[14%] left-6 md:left-16 max-w-md md:max-w-lg flex flex-col space-y-3 pointer-events-none"
     >
       <span className="mono-font text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#7cbcf0] font-semibold">
-        {beat.eyebrow}
+        {t(beat.eyebrowKey)}
       </span>
       <h3 className="text-[26px] md:text-5xl font-extrabold tracking-tight text-white/95 uppercase leading-[1.02] md:leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.85)]">
-        {beat.title}
+        {t(beat.titleKey)}
       </h3>
       <p className="text-[13px] md:text-base text-white/70 md:text-white/60 leading-relaxed text-balance drop-shadow-[0_1px_10px_rgba(0,0,0,0.8)]">
-        {beat.description}
+        {t(beat.descriptionKey)}
       </p>
     </motion.div>
   );
 }
 
 export default function QualitySection() {
+  const t = useTranslations("quality");
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -129,7 +131,7 @@ export default function QualitySection() {
           <ScrollImageSequence
             progress={scrollYProgress}
             frames={FRAMES}
-            alt="Metrology lab — calibrated CMM inspection of machined components"
+            alt={t("imgAlt")}
             // Desktop uses object-cover here, so mobile must too
             fit="cover"
             smoothing={0.06}
@@ -157,8 +159,8 @@ export default function QualitySection() {
         {/* Section title — centered, clears as the tour begins */}
         <SectionTitleCard
           index="04"
-          eyebrow="Metrology & Validation"
-          title="Quality"
+           eyebrow={t("eyebrow")}
+           title={t("title")}
           scrollYProgress={scrollYProgress}
           align="center"
         />
@@ -178,7 +180,7 @@ export default function QualitySection() {
 
         {/* Minimal text beats, timed to the steadiest equipment showcases */}
         {BEATS.map((beat) => (
-          <Beat key={beat.title} beat={beat} scrollYProgress={scrollYProgress} />
+          <Beat key={beat.titleKey} beat={beat} scrollYProgress={scrollYProgress} t={t} />
         ))}
 
         {/* Progress rail — desktop */}
@@ -188,7 +190,7 @@ export default function QualitySection() {
               04
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/90">
-              Metrology
+              {t("metrology")}
             </span>
           </div>
           <div className="relative w-[2px] h-16 bg-white/10 rounded-full overflow-hidden">
@@ -215,7 +217,7 @@ export default function QualitySection() {
           className="absolute bottom-6 inset-x-0 flex flex-col items-center space-y-2 pointer-events-none"
         >
           <span className="mono-font text-[9px] uppercase tracking-[0.5em] text-neutral-500">
-            Scroll to Tour the Lab
+             {t("scroll")}
           </span>
           <div className="w-[1px] h-10 bg-gradient-to-b from-[#3f97dd]/60 to-transparent animate-pulse" />
         </motion.div>
@@ -226,7 +228,7 @@ export default function QualitySection() {
           className="absolute bottom-[7%] inset-x-0 flex justify-center pointer-events-none"
         >
           <span className="mono-font text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-white/50 text-center px-6">
-            Hexagon · FARO · Zoller · Mahr · Haimer — 100% Documented
+             {t("closing")}
           </span>
         </motion.div>
       </div>

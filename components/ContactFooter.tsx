@@ -1,11 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 const PARTNERS = ["Procito", "Rabwin", "Frigate", "GDIZ"];
 
 export default function ContactFooter({ showCta = true }: { showCta?: boolean }) {
+  const t = useTranslations("footer");
+  const nav = useTranslations("nav");
   return (
     <footer id="contact" className="relative bg-[#f3f6fa]">
       {/* CTA band */}
@@ -18,14 +21,13 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
           className="flex flex-col items-center text-center space-y-6"
         >
           <span className="mono-font text-[11px] tracking-[0.4em] text-[#1d6fb5] uppercase font-bold">
-            06 // Start Your Project
+             {t("ctaEyebrow")}
           </span>
           <h2 className="text-3xl md:text-6xl font-extrabold tracking-tight text-slate-900 uppercase leading-none max-w-4xl">
-            Your Partner For High-Precision Manufacturing
+             {t("ctaTitle")}
           </h2>
           <p className="text-sm md:text-base text-slate-600 max-w-xl leading-relaxed text-balance">
-            Send us your drawings — receive a qualified quotation, a clear delivery date, and
-            components that hold tolerance. From prototype to series.
+             {t("ctaText")}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <a
@@ -54,9 +56,7 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
               <img src="/logo.png" alt="mpinger Engineering" className="h-9 w-auto" />
             </span>
             <p className="text-xs text-white/55 leading-relaxed max-w-sm">
-              Mpinger Engineering India Private Limited — an ISO 9001:2015 certified manufacturer
-              of high-precision CNC-milled and turned components, coordinated by mpinger GmbH,
-              Hannover.
+               {t("description")}
             </p>
             <p className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/35">
               GSTIN 33AANCM8803H1ZB · www.mpinger.de · www.mpinger.in
@@ -123,13 +123,13 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
                 href="/impressum"
                 className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/55 hover:text-white transition-colors"
               >
-                Impressum
+                {nav("imprint")}
               </Link>
               <Link
                 href="/datenschutz"
                 className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/55 hover:text-white transition-colors"
               >
-                Datenschutz
+                {nav("privacy")}
               </Link>
               <a
                 href="https://www.linkedin.com/company/mpinger/"
@@ -142,7 +142,7 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
             </div>
             <div className="flex items-center gap-6">
               <span className="mono-font text-[9px] uppercase tracking-[0.25em] text-white/40">
-                Partners:
+                 {t("partners")}:
               </span>
               {PARTNERS.map((partner) => (
                 <span
