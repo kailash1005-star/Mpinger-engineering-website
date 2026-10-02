@@ -10,7 +10,7 @@ const LOCATIONS = [
     role: "Coordination & Sales HQ",
     name: "mpinger Engineering GmbH",
     lines: ["Industriestraße 85B", "90537 Feucht, Deutschland"],
-    contact: ["+49 9128 4009947", "info@mpinger-engineering.com"],
+    contact: ["+49 9128 4009940", "info@mpinger-engineering.com"],
   },
   {
     country: "India",

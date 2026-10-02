@@ -76,8 +76,8 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
               90537 Feucht
             </p>
             <p className="mono-font text-[10px] text-[#a8d1f2] leading-relaxed">
-              <a href="tel:+4991284009947" className="hover:text-white transition-colors">
-                +49 9128 4009947
+              <a href="tel:+4991284009940" className="hover:text-white transition-colors">
+                +49 9128 4009940
               </a>
               <br />
               <a href="mailto:info@mpinger-engineering.com" className="hover:text-white transition-colors">
