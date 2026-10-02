@@ -19,30 +19,29 @@ export const SITE_URL = (
 ).replace(/\/$/, "");
 
 /**
- * Statutory company identity, taken from the published Impressum at
- * mpinger.de/impressum. Single source for the legal pages and JSON-LD.
+ * Statutory company identity, as supplied by the client for
+ * mpinger Engineering GmbH. Single source for the legal pages and JSON-LD.
  *
- * NOTE — registerCourt / registerNumber are NOT on the current published
- * Impressum. § 5 Abs. 1 Nr. 4 DDG requires the register and registration
- * number for a GmbH, and a single missing field is enough to ground an
- * Abmahnung. The placeholders below must be filled from the HRB extract
- * before this site goes live.
+ * NOTE — the register entry is the one the client supplied (Amtsgericht
+ * Hannover, HRB226035). If the company re-registers at the court for Feucht
+ * (Amtsgericht Nürnberg), that court issues a new HRB number; update both
+ * fields together, never the court alone.
  */
 export const COMPANY = {
-  legalName: "mpinger GmbH",
+  legalName: "mpinger Engineering GmbH",
   tradingName: "Mpinger Engineering",
-  managingDirector: "Ramkumar Palanisamy",
-  vatId: "DE290407187",
+  managingDirector: "Ramkumar Palanisamy, Sudha Ramkumar",
+  vatId: "DE363167199",
   registerCourt: "Amtsgericht Hannover",
-  registerNumber: "HRB — [TO BE CONFIRMED]",
+  registerNumber: "HRB226035",
   address: {
-    street: "Gustav-Schenk-Weg 53",
-    postalCode: "30455",
-    city: "Hannover",
+    street: "Industriestraße 85B",
+    postalCode: "90537",
+    city: "Feucht",
     country: "DE",
   },
-  phoneDE: "+49 (0) 511 10554580",
-  emailDE: "info@mpinger.de",
+  phoneDE: "+49 9128 4009947",
+  emailDE: "info@mpinger-engineering.com",
   phoneIN: "+91 755 001 5799",
   emailIN: "sales@mpinger-engineering.com",
   linkedIn: "https://www.linkedin.com/company/mpinger/",
@@ -50,15 +49,15 @@ export const COMPANY = {
 
 const GERMANY = {
   "@type": "Place",
-  name: "mpinger GmbH — Headquarters",
+  name: "mpinger Engineering GmbH — Headquarters",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Gustav-Schenk-Weg 53",
-    addressLocality: "Hannover",
-    postalCode: "30455",
+    streetAddress: "Industriestraße 85B",
+    addressLocality: "Feucht",
+    postalCode: "90537",
     addressCountry: "DE",
   },
-  telephone: "+49 511 790 900 96",
+  telephone: "+49 9128 4009947",
 };
 
 const INDIA = {
@@ -80,7 +79,7 @@ export const ORGANIZATION_JSON_LD = {
   "@type": "Organization",
   "@id": `${SITE_URL}/#organization`,
   name: "Mpinger Engineering",
-  legalName: "mpinger GmbH",
+  legalName: "mpinger Engineering GmbH",
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   image: `${SITE_URL}/posters/hero.webp`,
@@ -92,8 +91,8 @@ export const ORGANIZATION_JSON_LD = {
     {
       "@type": "ContactPoint",
       contactType: "sales",
-      email: "info@mpinger.de",
-      telephone: "+49 511 790 900 96",
+      email: "info@mpinger-engineering.com",
+      telephone: "+49 9128 4009947",
       areaServed: "EU",
       availableLanguage: ["en", "de"],
     },
@@ -107,11 +106,23 @@ export const ORGANIZATION_JSON_LD = {
     },
   ],
   taxID: "33AANCM8803H1ZB",
-  hasCredential: {
-    "@type": "EducationalOccupationalCredential",
-    credentialCategory: "certification",
-    name: "ISO 9001:2015",
-  },
+  hasCredential: [
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "certification",
+      name: "ISO 9001:2015",
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "certification",
+      name: "AS9100",
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "certification",
+      name: "EN 15085-2 Classification Level CL2",
+    },
+  ],
   knowsAbout: [
     "5-axis CNC milling",
     "CNC turning and mill-turn machining",

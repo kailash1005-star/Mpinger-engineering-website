@@ -28,7 +28,7 @@ const PILLARS = [
 ];
 
 const INDUSTRIES = [
-  "Aerospace",
+  "Aerospace Industry Manufacturing",
   "Defence",
   "Railway",
   "Automotive",
@@ -138,8 +138,11 @@ export default function AboutSection() {
               <span className="mono-font text-[11px] uppercase tracking-[0.2em] font-bold text-white bg-gradient-to-r from-[#0b4e86] to-[#1d6fb5] rounded-md px-4 py-2.5">
                  {t("certified")}
               </span>
-              <span className="mono-font text-[11px] uppercase tracking-[0.2em] font-semibold text-[#0b4e86] border border-[#3f97dd]/50 bg-[#3f97dd]/10 rounded-md px-4 py-2.5">
-                 {t("stage")}
+              <span className="mono-font text-[11px] uppercase tracking-[0.2em] font-bold text-white bg-gradient-to-r from-[#0b4e86] to-[#1d6fb5] rounded-md px-4 py-2.5">
+                 {t("as9100")}
+              </span>
+              <span className="mono-font text-[11px] uppercase tracking-[0.2em] font-bold text-white bg-gradient-to-r from-[#0b4e86] to-[#1d6fb5] rounded-md px-4 py-2.5">
+                 {t("en15085")}
               </span>
             </motion.div>
           </div>

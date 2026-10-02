@@ -1,6 +1,7 @@
 import CncScrollytelling from "@/components/CncScrollytelling";
 import SiteHeader from "@/components/SiteHeader";
 import AboutSection from "@/components/AboutSection";
+import CapabilitiesSection from "@/components/CapabilitiesSection";
 import PartsSection from "@/components/PartsSection";
 import MachinesSection from "@/components/MachinesSection";
 import QualitySection from "@/components/QualitySection";
@@ -47,6 +48,7 @@ export default async function Home() {
 
       {/* Company narrative sections */}
       <AboutSection />
+      <CapabilitiesSection />
       <PartsSection />
       <MachinesSection />
       <QualitySection />

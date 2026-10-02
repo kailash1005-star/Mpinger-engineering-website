@@ -33,7 +33,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const TITLE = "Mpinger Engineering — Precision CNC Manufacturing";
 const DESCRIPTION =
-  "ISO 9001:2015 certified manufacturer of high-precision 5-axis CNC-milled and turned components. German coordination from Hannover, precision manufacturing in Coimbatore.";
+  "ISO 9001:2015 certified manufacturer of high-precision 5-axis CNC-milled and turned components. German coordination from Feucht, precision manufacturing in Coimbatore.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

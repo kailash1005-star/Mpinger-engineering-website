@@ -8,9 +8,9 @@ const LOCATIONS = [
   {
     country: "Germany",
     role: "Coordination & Sales HQ",
-    name: "mpinger GmbH",
-    lines: ["Gustav-Schenk-Weg 53", "30455 Hannover, Deutschland"],
-    contact: ["+49 511 790 900 96", "info@mpinger.de"],
+    name: "mpinger Engineering GmbH",
+    lines: ["Industriestraße 85B", "90537 Feucht, Deutschland"],
+    contact: ["+49 9128 4009947", "info@mpinger-engineering.com"],
   },
   {
     country: "India",

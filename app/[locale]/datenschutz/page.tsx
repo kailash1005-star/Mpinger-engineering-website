@@ -6,7 +6,7 @@ import { COMPANY } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Datenschutzerklärung",
   description:
-    "Datenschutzerklärung der mpinger GmbH gemäß Art. 13 DSGVO.",
+    "Datenschutzerklärung der mpinger Engineering GmbH gemäß Art. 13 DSGVO.",
   alternates: { canonical: "/datenschutz" },
   robots: { index: false, follow: true },
 };
@@ -27,7 +27,7 @@ export default function Datenschutz() {
     <LegalPage
       title="Datenschutz"
       subtitle="Datenschutzerklärung gemäß Art. 13 DSGVO — Privacy notice under the GDPR."
-      updated="August 2026"
+      updated="Oktober 2026"
     >
       <section>
         <h2>1. Verantwortlicher / Data controller</h2>
@@ -251,9 +251,9 @@ export default function Datenschutz() {
         <h2>7. Beschwerderecht / Right to complain</h2>
         <p>
           Ihnen steht ein Beschwerderecht bei der zuständigen
-          Datenschutz-Aufsichtsbehörde zu. Zuständig ist die
-          Landesbeauftragte für den Datenschutz Niedersachsen, Prinzenstraße 5,
-          30159 Hannover.
+          Datenschutz-Aufsichtsbehörde zu. Zuständig ist das
+          Bayerische Landesamt für Datenschutzaufsicht (BayLDA), Promenade 18,
+          91522 Ansbach.
         </p>
       </section>
 

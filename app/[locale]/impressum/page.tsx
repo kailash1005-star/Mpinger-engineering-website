@@ -5,7 +5,7 @@ import { COMPANY } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Impressum",
   description:
-    "Impressum und Anbieterkennzeichnung der mpinger GmbH gemäß § 5 DDG.",
+    "Impressum und Anbieterkennzeichnung der mpinger Engineering GmbH gemäß § 5 DDG.",
   alternates: { canonical: "/impressum" },
   // Statutory pages carry no marketing value in search results
   robots: { index: false, follow: true },
@@ -16,7 +16,7 @@ export default function Impressum() {
     <LegalPage
       title="Impressum"
       subtitle="Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz) — Legal notice under German law."
-      updated="Juli 2026"
+      updated="Oktober 2026"
     >
       <section>
         <h2>Anbieter / Provider</h2>
@@ -33,7 +33,7 @@ export default function Impressum() {
 
       <section>
         <h2>Vertreten durch / Represented by</h2>
-        <p>Geschäftsführer: {COMPANY.managingDirector}</p>
+        <p>Geschäftsführer(in): {COMPANY.managingDirector}</p>
       </section>
 
       <section>

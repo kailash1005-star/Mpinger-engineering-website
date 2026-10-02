@@ -85,7 +85,7 @@ export default function SiteHeader() {
               lightHeader ? "text-slate-500" : "text-white/60"
             }`}
           >
-            DE · Hannover / IN · Coimbatore
+            DE · Feucht / IN · Coimbatore
           </span>
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
 

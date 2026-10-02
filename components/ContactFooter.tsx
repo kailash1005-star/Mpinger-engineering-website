@@ -31,10 +31,10 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <a
-              href="mailto:info@mpinger.de"
+              href="mailto:info@mpinger-engineering.com"
               className="mono-font text-[11px] uppercase tracking-[0.25em] font-bold text-white bg-gradient-to-r from-[#0b4e86] to-[#3f97dd] hover:from-[#0d5996] hover:to-[#56a8e6] transition-all duration-300 rounded-md px-7 py-3.5 shadow-[0_10px_28px_rgba(11,78,134,0.28)]"
             >
-              info@mpinger.de
+              info@mpinger-engineering.com
             </a>
             <a
               href="mailto:sales@mpinger-engineering.com"
@@ -69,19 +69,19 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
               Germany — HQ
             </span>
             <p className="text-xs text-white/60 leading-relaxed">
-              mpinger GmbH
+              mpinger Engineering GmbH
               <br />
-              Gustav-Schenk-Weg 53
+              Industriestraße 85B
               <br />
-              30455 Hannover
+              90537 Feucht
             </p>
             <p className="mono-font text-[10px] text-[#a8d1f2] leading-relaxed">
-              <a href="tel:+4951179090096" className="hover:text-white transition-colors">
-                +49 511 790 900 96
+              <a href="tel:+4991284009947" className="hover:text-white transition-colors">
+                +49 9128 4009947
               </a>
               <br />
-              <a href="mailto:info@mpinger.de" className="hover:text-white transition-colors">
-                info@mpinger.de
+              <a href="mailto:info@mpinger-engineering.com" className="hover:text-white transition-colors">
+                info@mpinger-engineering.com
               </a>
             </p>
           </div>

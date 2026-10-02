@@ -130,4 +130,54 @@ body {
   .engineering-field textarea::placeholder {
     color: #94a3b8;
   }
+
+  /* Strengths & Capabilities — the part image stays static; only the cards
+     move. Each card floats on its own phase and a light sheen sweeps across
+     them in sequence (--cap-i is the card index, set inline). */
+  .cap-card {
+    animation: cap-float 6s ease-in-out infinite;
+    animation-delay: calc(var(--cap-i, 0) * -0.75s);
+    transition: border-color 300ms ease, box-shadow 300ms ease;
+  }
+
+  .cap-card:hover {
+    border-color: rgba(63, 151, 221, 0.6);
+    box-shadow: 0 12px 32px rgba(11, 78, 134, 0.1);
+  }
+
+  .cap-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 35%,
+      rgba(63, 151, 221, 0.12) 50%,
+      transparent 65%
+    );
+    transform: translateX(-120%);
+    animation: cap-sheen 7.2s ease-in-out infinite;
+    animation-delay: calc(var(--cap-i, 0) * 0.9s);
+    pointer-events: none;
+  }
+}
+
+@keyframes cap-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes cap-sheen {
+  0% {
+    transform: translateX(-120%);
+  }
+  25%,
+  100% {
+    transform: translateX(120%);
+  }
 }
