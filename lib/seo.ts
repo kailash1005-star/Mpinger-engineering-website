@@ -41,7 +41,7 @@ export const COMPANY = {
     country: "DE",
   },
   phoneDE: "+49 9128 4009940",
-  emailDE: "info@mpinger-engineering.com",
+  emailDE: "info.de@mpinger-engineering.com",
   phoneIN: "+91 755 001 5799",
   emailIN: "sales@mpinger-engineering.com",
   linkedIn: "https://www.linkedin.com/company/mpinger/",
@@ -91,7 +91,7 @@ export const ORGANIZATION_JSON_LD = {
     {
       "@type": "ContactPoint",
       contactType: "sales",
-      email: "info@mpinger-engineering.com",
+      email: "info.de@mpinger-engineering.com",
       telephone: "+49 9128 4009940",
       areaServed: "EU",
       availableLanguage: ["en", "de"],

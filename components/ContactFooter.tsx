@@ -31,10 +31,10 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <a
-              href="mailto:info@mpinger-engineering.com"
+              href="mailto:info.de@mpinger-engineering.com"
               className="mono-font text-[11px] uppercase tracking-[0.25em] font-bold text-white bg-gradient-to-r from-[#0b4e86] to-[#3f97dd] hover:from-[#0d5996] hover:to-[#56a8e6] transition-all duration-300 rounded-md px-7 py-3.5 shadow-[0_10px_28px_rgba(11,78,134,0.28)]"
             >
-              info@mpinger-engineering.com
+              info.de@mpinger-engineering.com
             </a>
             <a
               href="mailto:sales@mpinger-engineering.com"
@@ -80,8 +80,8 @@ export default function ContactFooter({ showCta = true }: { showCta?: boolean })
                 +49 9128 4009940
               </a>
               <br />
-              <a href="mailto:info@mpinger-engineering.com" className="hover:text-white transition-colors">
-                info@mpinger-engineering.com
+              <a href="mailto:info.de@mpinger-engineering.com" className="hover:text-white transition-colors">
+                info.de@mpinger-engineering.com
               </a>
             </p>
           </div>
